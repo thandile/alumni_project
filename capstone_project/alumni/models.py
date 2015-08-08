@@ -1,0 +1,90 @@
+from django.db import models
+from django.contrib.auth.models import User
+
+# GRSJAR001, Jarryd Garisch, 08/08/2015
+
+'''
+# https://docs.djangoproject.com/en/1.8/topics/auth/default/
+# The primary attributes of the default user are:
+    username
+    password
+    email
+    first_name
+    last_name
+in django there is just 'User', to create a superuser change permissions on this object instead of using a child of user
+'''
+
+class Profile(models.Model):
+    user = models.ForeignKey('user', related_name='user')
+
+    city = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255, blank=True, null=True)
+
+    degree = models.CharField(max_length=255, blank=True, null=True)
+    
+    # company = models.CharField(max_length=255, blank=True, null=True)
+
+    grad_year = models.IntegerField(max_length=255, blank=True, null=True)
+    
+    # will  useful to have the following fields on most things:
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated_date = models.DateTimeField(auto_now=True)
+    
+    def __unicode__(self):
+        return self.name, self.surname
+
+# instead of company on the profile itself, job object linked to a profle
+class Job(models.Model): # job in the 'piece of work history' sense, not a job advert
+
+    company_name = models.CharField(max_length=255, blank=True, null=True)
+    job_desc = models.CharField(max_length=255, blank=True, null=True)
+    job_title = models.CharField(max_length=255, blank=True, null=True) #the reference for the company advertising?
+    
+    # thinking that we can grab jobs in their order of dates on the profile. 
+    start_date = models.DateTimeField() #blank=True, null=True <- allow nulls?
+    end_date = models.DateTimeField()
+    
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated_date = models.DateTimeField(auto_now=True)
+    
+    def __unicode__(self):
+        return self.company_name, self.job_desc, self.job_title
+
+class Advert(models.Model): # "Jobs"
+    user = models.ForeignKey('user', related_name='user')
+
+    city = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255, blank=True, null=True)
+
+    title = models.CharField(max_length=255, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    reference = models.CharField(max_length=255, blank=True, null=True) #the reference for the company advertising?
+    
+    closing_date = models.DateTimeField()
+    
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated_date = models.DateTimeField(auto_now=True)
+    
+    def __unicode__(self):
+        return self.title, self.description
+
+class Event(models.Model):
+    # foreign key should be to the user who created the original Event
+    user = models.ForeignKey('user', related_name='user')
+
+    # location - may need to change this one.
+    street = models.CharField(max_length=255, blank=True, null=True) # i.e street, road, lane, drive, etc... with a house/flat number
+    city = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255, blank=True, null=True)
+
+    title = models.CharField(max_length=255, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    event_type = models.CharField(max_length=255, blank=True, null=True) # event type? pre-defined things such as 'Staff' + 'Public' or anything? may want to change this
+
+    event_date = models.DateTimeField()
+    
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated_date = models.DateTimeField(auto_now=True)
+    
+    def __unicode__(self):
+        return self.title, self.description
