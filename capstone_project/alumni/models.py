@@ -15,7 +15,7 @@ in django there is just 'User', to create a superuser change permissions on this
 '''
 
 class Profile(models.Model):
-    user = models.ForeignKey('user', related_name='user')
+    user = models.ForeignKey(User, related_name='user_obj')
 
     city = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
@@ -24,7 +24,8 @@ class Profile(models.Model):
     
     # company = models.CharField(max_length=255, blank=True, null=True)
 
-    grad_year = models.IntegerField(max_length=255, blank=True, null=True)
+    #grad_year as DeciminalField(maxDigits = 4)?
+    grad_year = models.IntegerField(blank=True, null=True)
     
     # will  useful to have the following fields on most things:
     created_date = models.DateTimeField(auto_now_add=True)
@@ -51,7 +52,7 @@ class Job(models.Model): # job in the 'piece of work history' sense, not a job a
         return self.company_name, self.job_desc, self.job_title
 
 class Advert(models.Model): # "Jobs"
-    user = models.ForeignKey('user', related_name='user')
+    user = models.ForeignKey(User, related_name='advert_user')
 
     city = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
@@ -70,7 +71,7 @@ class Advert(models.Model): # "Jobs"
 
 class Event(models.Model):
     # foreign key should be to the user who created the original Event
-    user = models.ForeignKey('user', related_name='user')
+    user = models.ForeignKey(User, related_name='event_user')
 
     # location - may need to change this one.
     street = models.CharField(max_length=255, blank=True, null=True) # i.e street, road, lane, drive, etc... with a house/flat number
@@ -88,3 +89,6 @@ class Event(models.Model):
     
     def __unicode__(self):
         return self.title, self.description
+
+
+# Forum, Thread + Post makes sense - see here: http://lightbird.net/dbe/forum1.html
