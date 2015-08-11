@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from thumbs import ImageWithThumbsField
+
 
 # GRSJAR001, Jarryd Garisch, 08/08/2015
 
@@ -26,13 +28,13 @@ class Profile(models.Model):
 
     #grad_year as DeciminalField(maxDigits = 4)?
     grad_year = models.IntegerField(blank=True, null=True)
-    
+    photo = ImageWithThumbsField(upload_to='photo', sizes=((125,125),(200,200)), null=True)
     # will  useful to have the following fields on most things:
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
-    
+
     def __unicode__(self):
-        return self.name, self.surname
+        return str(self.city) + ', ' + str(self.country) + ', ' + str(self.degree) + ', ' + str(self.grad_year) + ', ' + str(self.user)
 
 # instead of company on the profile itself, job object linked to a profle
 class Job(models.Model): # job in the 'piece of work history' sense, not a job advert
