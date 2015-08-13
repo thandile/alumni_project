@@ -9,7 +9,9 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^create/$', views.create, name='create'),
-    url(r'^profile/$', views.profile, name='profile')
+    url(r'^profile/$', views.create_profile, name='create_profile'),
+   # url(r'^userprofile/$', views.profile, name='profile')
+
     # add events, etc here later on...
 
 ]

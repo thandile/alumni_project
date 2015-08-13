@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from thumbs import ImageWithThumbsField
+#from thumbs import ImageWithThumbsField
 
 
 # GRSJAR001, Jarryd Garisch, 08/08/2015
@@ -18,17 +18,15 @@ in django there is just 'User', to create a superuser change permissions on this
 
 class Profile(models.Model):
     user = models.ForeignKey(User, related_name='user_obj')
-
     city = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
-
+    grad_year = models.IntegerField(blank=True, null=True)
     degree = models.CharField(max_length=255, blank=True, null=True)
-    
-    # company = models.CharField(max_length=255, blank=True, null=True)
+    #company = models.CharField(max_length=255, blank=True, null=True)
 
     #grad_year as DeciminalField(maxDigits = 4)?
-    grad_year = models.IntegerField(blank=True, null=True)
-    photo = ImageWithThumbsField(upload_to='photo', sizes=((125,125),(200,200)), null=True)
+
+    #photo = ImageWithThumbsField(upload_to='photo', sizes=((125,125),(200,200)), null=True)
     # will  useful to have the following fields on most things:
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
