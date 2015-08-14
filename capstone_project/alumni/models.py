@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-#from thumbs import ImageWithThumbsField
 
 
 # GRSJAR001, Jarryd Garisch, 08/08/2015
@@ -25,7 +24,6 @@ class Profile(models.Model):
     #company = models.CharField(max_length=255, blank=True, null=True)
 
     #grad_year as DeciminalField(maxDigits = 4)?
-
     #photo = ImageWithThumbsField(upload_to='photo', sizes=((125,125),(200,200)), null=True)
     # will  useful to have the following fields on most things:
     created_date = models.DateTimeField(auto_now_add=True)

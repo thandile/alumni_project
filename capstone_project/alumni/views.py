@@ -79,6 +79,7 @@ def create_profile(request):  #create profile
     user = User.objects.latest('pk')
     prof_form = ProfileForm()
     if request.method == "POST":
+
         prof_form = ProfileForm(request.POST)
         profile = Profile(city = request.POST.get("city"), country = request.POST.get("country"),
                     degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"),
