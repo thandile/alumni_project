@@ -66,7 +66,22 @@ def create(request):
     return render(request, '../templates/alumni/create.html', {'form': form})
 #return HttpResponse("You're looking at question %s." % question_id)
 
+def edit_profile(request):
+	degree = forms.CharField(required = True)
+	city = forms.CharField(required = True)
+	grad_year = forms.DateTimeField(required = True)
+	country = forms.CharField(required = True)
+	if request.method == 'POST':
+		 profile = Profile(city = request.POST.get("city"), country = request.POST.get("country"), \
+                    degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"), user_id =2)#,\
+                    #photo = request.FILES['photo']) #link profile to user
+        profile.save()
+        return HttpResponse("Your profile has been Edited")
+    else:
+        form = ProfileForm()
+        return render(request, '../templates/alumni/createProfile.html', {'form': form})
 
+			
 def index(request):
     return HttpResponse("Hello, world. You're at the alumni index.")
 
@@ -75,7 +90,7 @@ def profile(request):
     form = UserForm()
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES)
-        #if form.is_valid():
+        #if form.is_valid()
            # return HttpResponse(form.cleaned_data[""])
         profile = Profile(city = request.POST.get("city"), country = request.POST.get("country"), \
                     degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"), user_id =2)#,\
