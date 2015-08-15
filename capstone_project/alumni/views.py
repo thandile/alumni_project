@@ -20,16 +20,23 @@ class UserCreationForm(forms.Form):
 user = AL.ModelMultipleChoiceField(autocomplete='UserAutocomplete')
 '''
 
-class UserForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password', 'first_name', 'last_name')
+class UserForm(forms.Form):
+        username = forms.CharField(max_length=50)
+        email = forms.EmailField(max_length=50)
+        password = forms.CharField(max_length=32, widget=forms.PasswordInput)
+        first_name = forms.CharField(max_length=50, label = "first name")
+        last_name = forms.CharField(max_length=50, label = "last name")
+
 
 class ProfileForm(forms.Form):
-        degree = forms.CharField(max_length=50, label= "degree")
+        degree = forms.CharField(max_length=50)
         grad_year = forms.IntegerField(label= "graduation year")
         city = forms.CharField(max_length=50)
         country = forms.CharField(max_length=50)
+
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=50)
+    password = forms.CharField(max_length=32, widget=forms.PasswordInput)
 
 '''
 from forms import UserForm
@@ -104,3 +111,16 @@ def create_profile(request):  #create profile
     else:
         user_info = Profile.objects.get(pk=1)
         return render(request, '../templates/alumni/profile.html', {'user_info': user_info} ) '''
+
+def log_in(request):
+    log_in = LoginForm()
+    if request.method == "POST":
+        log_in = LoginForm(request.POST)
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        login(request, user)
+        return render(request,'../templates/alumni/homepage.html', {'username' : username})
+    else:
+        log_in = LoginForm()
+        return render(request, '../templates/alumni/login.html', {'form':log_in})

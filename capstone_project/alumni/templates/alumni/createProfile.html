@@ -24,7 +24,7 @@ Released   : 20140101
 <!--[if IE 6]><link href= "{% static 'default_ie6.css' %}" rel="stylesheet" type="text/css" /><![endif]-->
 
 </head>
-<body>
+
 <div id="header-wrapper">
 	<div id="header" class="container">
 		<div id="logo">
@@ -42,7 +42,7 @@ Released   : 20140101
 	</div>
 	<div id="banner" class="container"><img src="{% static 'images/download.jpg' %}" width="1200" height="400" alt="" /></div>
 </div>
-
+<body>
 <div id = "frm">
 <form method="post" action="" enctype="multipart/form-data">
     {% csrf_token %}
@@ -50,6 +50,7 @@ Released   : 20140101
     <input type="submit" value="Create new user profile" />
 </form>
 </div>
+</body>
 
 <div id="copyright" class="container">
 	<p>&copy; Untitled. All rights reserved. | Photos by <a href="http://fotogrph.com/">Fotogrph</a> | Design by <a href="http://templated.co" rel="nofollow">TEMPLATED</a>.</p>
@@ -62,5 +63,5 @@ Released   : 20140101
 			<li><a href="#" class="icon icon-rss"><span>Pinterest</span></a></li>
 		</ul>
 </div>
-</body>
+
 </html>
