@@ -1,0 +1,33 @@
+<!--TODO:: Need to implement a base.html, which we can extend from -->
+
+<!-- Forums  -->
+<div id="list">
+<table border="0" cellpadding="4" width="100%">
+    <tr>
+        <td></td>
+        <td>Posts</td>
+        <td>Last post</td>
+        <td></td>
+    </tr>
+
+    {% for forum in forums %}
+    <tr>
+        <td {% if forloop.last %}class="last"{% endif %}>
+        <!-- equivlanet: <div class="title"> <a href="{% url 'alumni.views.forum' pk=forum.pk %}"> {{ forum.title }}</a> -->
+        
+        <!--<div class="title"> <a href="{% url 'forum' pk=forum.pk %}"> {{ forum.title }}</a>
+            </div></td>
+        -->
+
+        <td {% if forloop.last %}class="last"{% endif %}>{{ forum.get_num_posts }}</td>
+        <td {% if forloop.last %}class="last"{% endif %}>
+            {{ forum.get_latest_post.short|linebreaksbr }}</td>
+        <!--
+        <td {% if forloop.last %}class="last"{% endif %}>
+            <a class="button" href="{% url alumni.views.main forum.pk %}">VIEW</a>
+        </td>
+        -->
+    </tr>
+
+    {% endfor %}
+</div>

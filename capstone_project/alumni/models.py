@@ -14,6 +14,12 @@ from django.contrib.auth.models import User
 in django there is just 'User', to create a superuser change permissions on this object instead of using a child of user
 '''
 
+'''
+Solid, up-to-date, reference: http://riceball.com/d/content/django-18-minimal-application-using-generic-class-based-views
+
+'''
+
+
 class Profile(models.Model):
     user = models.ForeignKey(User, related_name='user_obj')
 
@@ -52,7 +58,7 @@ class Job(models.Model): # job in the 'piece of work history' sense, not a job a
         return self.company_name, self.job_desc, self.job_title
 
 class Advert(models.Model): # "Jobs"
-    user = models.ForeignKey(User, related_name='advert_user')
+    creating_user = models.ForeignKey(User, related_name='advert_user')
 
     city = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
@@ -71,7 +77,7 @@ class Advert(models.Model): # "Jobs"
 
 class Event(models.Model):
     # foreign key should be to the user who created the original Event
-    user = models.ForeignKey(User, related_name='event_user')
+    creating_user = models.ForeignKey(User, related_name='event_user')
 
     # location - may need to change this one.
     street = models.CharField(max_length=255, blank=True, null=True) # i.e street, road, lane, drive, etc... with a house/flat number
@@ -92,3 +98,64 @@ class Event(models.Model):
 
 
 # Forum, Thread + Post makes sense - see here: http://lightbird.net/dbe/forum1.html
+# A forum has many threads. Each thread has many posts.
+class Forum(models.Model):
+    title = models.CharField(max_length=255, blank=True, null=True)
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated_date = models.DateTimeField(auto_now=True)
+    
+    # forum functions 
+    def get_num_posts(self):
+        # count the number of posts in each Thread, then sum all of them up
+        return sum([t.get_num_posts() for t in self.thread_set.count()]) # Django's "_set" voodoo explained here: http://stackoverflow.com/questions/14228477/set-attributes-on-django-models
+
+    # could add a get latest post at the forum level that checks accross all theads in *this* forum if desired later
+
+
+    # 'get_absolute_url' 
+
+    def __unicode__(self):
+        return self.title
+
+class Thread(models.Model):
+    title = models.CharField(max_length=255, blank=True, null=True)
+
+    forum = models.ForeignKey(Forum)
+    creating_user = models.ForeignKey(User, related_name='thread_user')
+    
+    # thread functions
+    def get_num_posts(self):
+        # count the number of posts in *this* particular thread
+        return self.post_set.count()
+
+    def get_num_replies(self):
+        return (self.get_num_posts()-1)
+
+    def get_latest_post(self):
+        if self.post_set.count():
+            # order all posts by date of creation, return the first one
+            return self.post_set.order_by("created_date")[0]
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated_date = models.DateTimeField(auto_now=True)
+    
+    def __unicode__(self):
+        return self.title
+
+class Post(models.Model):
+    title = models.CharField(max_length=255, blank=True, null=True)
+
+    thread = models.ForeignKey(Thread)
+    creating_user = models.ForeignKey(User, related_name='post_user')
+    
+    text = models.TextField(max_length=10000) # The actual contents of the post itself. TEXT ONLY for now!
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated_date = models.DateTimeField(auto_now=True)
+    
+    def __unicode__(self):
+        return u"%s - %s - %s" % (self.creating_user, self.thread, self.title)
+
+
+# Admin objects?
