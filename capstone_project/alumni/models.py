@@ -47,7 +47,7 @@ class Job(models.Model): # job in the 'piece of work history' sense, not a job a
     last_updated_date = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return self.company_name, self.job_desc, self.job_title
+        return str(self.company_name) + ', '+ str(self.job_desc) + ', ' +str(self.job_title)
 
 class Advert(models.Model): # "Jobs"
     user = models.ForeignKey(User, related_name='advert_user')
@@ -65,7 +65,7 @@ class Advert(models.Model): # "Jobs"
     last_updated_date = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return self.title, self.description
+        return str(self.title) + ', ' + str(self.description)
 
 class Event(models.Model):
     # foreign key should be to the user who created the original Event
@@ -86,7 +86,7 @@ class Event(models.Model):
     last_updated_date = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return self.title, self.description
+        return str(self.title) + ', ' + str(self.description)
 
 
 # Forum, Thread + Post makes sense - see here: http://lightbird.net/dbe/forum1.html
