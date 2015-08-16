@@ -10,8 +10,8 @@ from alumni import views
 # https://docs.djangoproject.com/en/1.8/topics/http/urls/
 
 # url patterns in this file are all prefixed by alumni/
+
 urlpatterns = [
-<<<<<<< HEAD
 	url(r'main/', views.main, name = 'main'),
 	
 	url(r'^$', views.index, name = 'index'), 			# $:: End of String match character
@@ -24,16 +24,12 @@ urlpatterns = [
 	url(r'^new_thread/(?P<forum_pk>[0-9]+)/$', views.create_new_thread, name = "new_thread"),
 
 	url(r'^post/(?P<thread_pk>[0-9]+)/$', views.post, name = "new_post"), # idea here is for creating a new post, NOT a listing of posts like the above
-=======
-    url(r'^$', views.index, name='index'),
-    url(r'^create/$', views.create, name='create'),
+
     url(r'^profile/$', views.create_profile, name='create_profile'),
     url(r'^login/$', views.log_in, name='login'),
     url(r'^userprofile/$', views.profile, name='user_profile'),
     url(r'^home/$', views.home, name='home'),
-    url(r'editProfile/$',views.view_profile, name ='view_profile'),
->>>>>>> 67a84fbd8331f19adfc8d34a392a89c50ae74f99
-
+    url(r'^editProfile/$',views.view_profile, name ='view_profile'),
 	# url(r'^thread/(?P<forum_pk>[0-9]+)/$', views.postthread, name = 'postthread'),	
 	# url(r"^thread/(\d+)/$", views.create, name = 'thread'),
 ]

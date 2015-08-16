@@ -97,7 +97,6 @@ class Event(models.Model):
 
 
 # Forum, Thread + Post makes sense - see here: http://lightbird.net/dbe/forum1.html
-<<<<<<< HEAD
 # A forum has many threads. Each thread has many posts.
 class Forum(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
@@ -164,8 +163,3 @@ class Post(models.Model):
     
     def __unicode__(self):
         return u"%s - %s - %s" % (self.creating_user, self.thread, self.title)
-
-
-# Admin objects?
-=======
->>>>>>> 67a84fbd8331f19adfc8d34a392a89c50ae74f99

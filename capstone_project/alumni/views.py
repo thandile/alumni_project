@@ -5,20 +5,13 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
-from alumni.models import Profile
+# edit this::
+from alumni.models import Profile as Profile
+from alumni import models
 from django.http import HttpResponseRedirect
 from django import forms
 
-<<<<<<< HEAD
 from django.core.urlresolvers import reverse
-# from settings import MEDIA_ROOT, MEDIA_URL
-
-import autocomplete_light as AL
-=======
-
->>>>>>> 67a84fbd8331f19adfc8d34a392a89c50ae74f99
-
-from alumni import models
 from django.core.paginator import Paginator
 from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
@@ -37,54 +30,22 @@ class ProfileForm(forms.Form):
         city = forms.CharField(max_length=50)
         country = forms.CharField(max_length=50)
 
-<<<<<<< HEAD
 class PostForm(forms.ModelForm):
     class Meta:
         model = models.Post
         fields = ('title', 'text')
 
-def create(request):
-	form = UserForm()
-	if request.method == "POST":
-=======
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=50)
     password = forms.CharField(max_length=32, widget=forms.PasswordInput)
 
-'''
-from forms import UserForm
-
-def lexusadduser(request):
-    if request.method == "POST":
-        form = UserForm(request.POST)
-        if form.is_valid():
-            new_user = User.objects.create_user(**form.cleaned_data)
-            login(new_user)
-            # redirect, or however you want to get to the main view
-            return HttpResponseRedirect('main.html')
-    else:
-        form = UserForm() 
-
-    return render(request, 'adduser.html', {'form': form}) 
-'''
-
-
 def create(request):
     form = UserForm()
     if request.method == "POST":
->>>>>>> 67a84fbd8331f19adfc8d34a392a89c50ae74f99
 		# then they are sending data, create a new user
         form = UserForm(request.POST)
         if form.is_valid():
             new_user = User.objects.create_user(**form.cleaned_data)
-<<<<<<< HEAD
-            #login(new_user)
-            return HttpResponse("User successfully created.")
-	else:
-		# they are requesting the page, give 
-		form = UserForm()
-	return render(request, '../templates/alumni/create.html', {'form': form})
-=======
             username = request.POST['username']
             password = request.POST['password']
             user = authenticate(username=username, password=password)
@@ -95,12 +56,9 @@ def create(request):
         form = UserForm()
     return render(request, '../templates/alumni/create.html', {'form': form})
 
->>>>>>> 67a84fbd8331f19adfc8d34a392a89c50ae74f99
-
 def index(request):
     return HttpResponse("Hello, world. You're at the alumni index.")
 
-<<<<<<< HEAD
 def main(request):
     # Main listing - all forums
     forums = models.Forum.objects.all()
@@ -162,25 +120,13 @@ def post(request, thread_pk):
 def create_new_thread():
     return HttpResponse("TODO.")
 
-'''
-# do want a function to make new posts called post though
-def post(request, post_pk):
-    """Display a post form."""
-    subject = Thread.objects.get(pk=post_pk).title
-    return render_to_response("forum/post.html", add_csrf(request, subject=subject, title=title))
-
-'''
-
 # Django's CreateView, ListView, UpdateView and DeleteView should be used for posting new threads, comments, etc...
 # these use 'default' names for their html templates 
 # http://riceball.com/d/content/django-18-minimal-application-using-generic-class-based-views
 # e.g. a list view will be something like templates/alumni/forum_list.html (templates/appname/model_list.html)
 
-=======
-
 def logout_view(request):
     logout(request)
-
 
 def create_profile(request):  #create profile
     user = User.objects.latest('pk')
@@ -220,7 +166,6 @@ def profile(request):   #view profile info
         grad_year = user_info.grad_year
         return render(request, '../templates/alumni/profile.html', {'name' : name, 'surname' : surname, 'email' : email, 'city': city, "country": country, "degree" : degree, "grad_year": grad_year} )
 
-
 def view_profile(request):
 #view profile info
     if request.method =="POST":
@@ -251,9 +196,6 @@ def view_profile(request):
            profile.save()
            return HttpResponse("Your profile has been Edited")
 
-
-
-
 def log_in(request):
     log_in = LoginForm()
     if request.method == "POST":
@@ -267,7 +209,5 @@ def log_in(request):
         log_in = LoginForm()
         return render(request, '../templates/alumni/login.html', {'form':log_in})
 
-
 def home(request):
     return render(request, '../templates/alumni/homepage.html')
->>>>>>> 67a84fbd8331f19adfc8d34a392a89c50ae74f99
