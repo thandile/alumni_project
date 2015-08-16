@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+
 # GRSJAR001, Jarryd Garisch, 08/08/2015
 
 '''
@@ -23,23 +24,20 @@ Solid, up-to-date, reference: http://riceball.com/d/content/django-18-minimal-ap
 
 class Profile(models.Model):
     user = models.ForeignKey(User, related_name='user_obj')
-
     city = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
-
+    grad_year = models.IntegerField(blank=True, null=True)
     degree = models.CharField(max_length=255, blank=True, null=True)
-    
-    # company = models.CharField(max_length=255, blank=True, null=True)
+    #company = models.CharField(max_length=255, blank=True, null=True)
 
     #grad_year as DeciminalField(maxDigits = 4)?
-    grad_year = models.IntegerField(blank=True, null=True)
-    
+    #photo = ImageWithThumbsField(upload_to='photo', sizes=((125,125),(200,200)), null=True)
     # will  useful to have the following fields on most things:
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
-    
+
     def __unicode__(self):
-        return self.name, self.surname
+        return str(self.city) + ', ' + str(self.country) + ', ' + str(self.degree) + ', ' + str(self.grad_year) + ', ' + str(self.user)
 
 # instead of company on the profile itself, job object linked to a profle
 class Job(models.Model): # job in the 'piece of work history' sense, not a job advert
@@ -56,7 +54,7 @@ class Job(models.Model): # job in the 'piece of work history' sense, not a job a
     last_updated_date = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return self.company_name, self.job_desc, self.job_title
+        return str(self.company_name) + ', '+ str(self.job_desc) + ', ' +str(self.job_title)
 
 class Advert(models.Model): # "Jobs"
     creating_user = models.ForeignKey(User, related_name='advert_user')
@@ -74,7 +72,7 @@ class Advert(models.Model): # "Jobs"
     last_updated_date = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return self.title, self.description
+        return str(self.title) + ', ' + str(self.description)
 
 class Event(models.Model):
     # foreign key should be to the user who created the original Event
@@ -95,10 +93,11 @@ class Event(models.Model):
     last_updated_date = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return self.title, self.description
+        return str(self.title) + ', ' + str(self.description)
 
 
 # Forum, Thread + Post makes sense - see here: http://lightbird.net/dbe/forum1.html
+<<<<<<< HEAD
 # A forum has many threads. Each thread has many posts.
 class Forum(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
@@ -168,3 +167,5 @@ class Post(models.Model):
 
 
 # Admin objects?
+=======
+>>>>>>> 67a84fbd8331f19adfc8d34a392a89c50ae74f99
