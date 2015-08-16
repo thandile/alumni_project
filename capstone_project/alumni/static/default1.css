@@ -71,13 +71,13 @@ a:hover
 .image img
 {
 	display: block;
-	width: 100%;
+	width: 50%;
 }
 
 .image-full
 {
 	display: block;
-	width: 100%;
+	width: 50%;
 	margin: 0 0 2em 0;
 }
 

@@ -168,33 +168,28 @@ def profile(request):   #view profile info
 
 def view_profile(request):
 #view profile info
-    if request.method =="POST":
-        pass
+  def create_profile(request):  #create profile
+    user = User.objects.latest('pk')
+    prof_form = ProfileForm()
+    if request.method == "POST":
+
+        prof_form = ProfileForm(request.POST)
+        profile = Profile(city = request.POST.get("city"), country = request.POST.get("country"),
+                    degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"),
+                          user_id = user.id )
+        profile.save()
+        user_info = Profile.objects.get(user_id=user.id)
+        name = user.first_name
+        surname = user.last_name
+        email = user.email
+        city = user_info.city
+        country = user_info.country
+        degree = user_info.degree
+        grad_year = user_info.grad_year
+        return render(request, '../templates/alumni/profile.html', {'name' : name, 'surname' : surname, 'email' : email, 'city': city, "country": country, "degree" : degree, "grad_year": grad_year} )
     else:
-        form = ProfileForm()
-        user = request.user
-        user_info = Profile.objects.get(user_id =user.id)
-        form.name = user.first_name
-        form.surname = user.last_name
-        form.email = user.email
-        form.city = user_info.city
-        form.country = user_info.country
-        form.degree = user_info.degree
-        form.grad_year = user_info.grad_year
-        return render(request, '../templates/alumni/createProfile.html', {'form': form})
-
-        #return render(request, '../templates/alumni/profile.html', {'name' : name, 'surname' : surname, 'email' : email, 'city': city, "country": country, "degree" : degree, "grad_year": grad_year} )
-
-    if request.method == 'POST':
-           degree = forms.CharField(required = True)
-           city = forms.CharField(required = True)
-           grad_year = forms.DateTimeField(required = True)
-           country = forms.CharField(required = True)
-           profile = Profile(city = request.POST.get("city"), country = request.POST.get("country"), \
-           degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"), user_id =2)#,\
-                        #photo = request.FILES['photo']) #link profile to user
-           profile.save()
-           return HttpResponse("Your profile has been Edited")
+        prof_form = ProfileForm()
+        return render(request, '../templates/alumni/createProfile.html', {'form': prof_form})
 
 def log_in(request):
     log_in = LoginForm()
