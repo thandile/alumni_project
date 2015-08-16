@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 # GRSJAR001, Jarryd Garisch, 08/08/2015
 
@@ -60,7 +61,7 @@ class Job(models.Model): # job in the 'piece of work history' sense, not a job a
 class Advert(models.Model): # "Jobs"
     creating_user = models.ForeignKey(User, related_name='advert_user')
 
-    city = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True) # why 255? -> mySQL limit
     country = models.CharField(max_length=255, blank=True, null=True)
 
     title = models.CharField(max_length=255, blank=True, null=True)
@@ -108,12 +109,13 @@ class Forum(models.Model):
     # forum functions 
     def get_num_posts(self):
         # count the number of posts in each Thread, then sum all of them up
-        return sum([t.get_num_posts() for t in self.thread_set.count()]) # Django's "_set" voodoo explained here: http://stackoverflow.com/questions/14228477/set-attributes-on-django-models
+        return sum([t.get_num_posts() for t in self.thread_set.all()]) # Django's "_set" voodoo explained here: http://stackoverflow.com/questions/14228477/set-attributes-on-django-models
 
     # could add a get latest post at the forum level that checks accross all theads in *this* forum if desired later
 
-
-    # 'get_absolute_url' 
+    def get_absolute_url(self): # allows avoiding repition in html templates!
+        '''Returns url where forums can be viewed on website - displayed as a *list* of forums'''
+        return reverse('alumni.views.forum', kwargs={'forum_pk':self.pk})
 
     def __unicode__(self):
         return self.title
@@ -139,7 +141,10 @@ class Thread(models.Model):
 
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
-    
+
+    def get_absolute_url(self):
+        return reverse('alumni.views.thread', kwargs={'thread_pk':self.pk})
+
     def __unicode__(self):
         return self.title
 
@@ -153,6 +158,10 @@ class Post(models.Model):
 
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
+
+    def get_absolute_url(self):
+        '''Returns url to reply to a particular post, pk of the thread the post belongs is relevant'''
+        return reverse('alumni.views.post', kwargs={'thread_pk':self.thread.pk})
     
     def __unicode__(self):
         return u"%s - %s - %s" % (self.creating_user, self.thread, self.title)

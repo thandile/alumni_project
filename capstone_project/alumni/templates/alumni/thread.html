@@ -1,0 +1,23 @@
+<!--- Listing of posts in a particular thread -->
+
+<div id="list">
+<table border="0" cellpadding="4" width="100%">
+    <tr>
+        <td>Title</td>
+        <td>Post Body</td>
+        <td></td>
+        <td></td>
+    </tr>
+    {% for post in posts.object_list %}
+    {% csrf_token %}
+    <tr>
+        <td {% if forloop.last %}class="last"{% endif %}>
+        <div class="title"> {{ post.title }}</a>
+        </div></td>
+        <td {% if forloop.last %}class="last"{% endif %}>{{ post.text}}</td>
+        <td {% if forloop.last %}class="last"{% endif %}>
+            <a class="button" href="{{post.get_absolute_url}}">Reply to Post</a>
+        </td>
+    </tr>
+    {% endfor %}
+</div>

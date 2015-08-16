@@ -1,0 +1,26 @@
+<!--- Listing of threads in a particular forum -->
+<!-- todo: create new thread -->
+
+<div id="list">
+<table border="0" cellpadding="4" width="100%">
+    <tr>
+        <td></td>
+        <td>Author</td>
+        <td></td>
+    </tr>
+
+    {% for thread in threads.object_list %}
+    {% csrf_token %}
+    
+    <tr>
+        <td {% if forloop.last %}class="last"{% endif %}>
+        <div class="title"> <a href="{{thread.get_absolute_url}}"> {{ thread.title }}</a>
+        </div></td>
+        <td {% if forloop.last %}class="last"{% endif %}>{{ thread.creating_user}}</td>
+        <td {% if forloop.last %}class="last"{% endif %}>
+            <a class="button" href="{{thread.get_absolute_url}}">View Thread</a>
+        </td>
+    </tr>
+
+    {% endfor %}
+</div>
