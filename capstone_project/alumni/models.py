@@ -36,7 +36,7 @@ class Profile(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
 
-    def __unicode__(self):
+    def __unicode__(self): # change to __string__ depending on version of python
         return str(self.city) + ', ' + str(self.country) + ', ' + str(self.degree) + ', ' + str(self.grad_year) + ', ' + str(self.user)
 
 # instead of company on the profile itself, job object linked to a profle
