@@ -29,7 +29,6 @@ class Profile(models.Model):
     grad_year = models.IntegerField(blank=True, null=True)
     degree = models.CharField(max_length=255, blank=True, null=True)
     #company = models.CharField(max_length=255, blank=True, null=True)
-
     #grad_year as DeciminalField(maxDigits = 4)?
     #photo = ImageWithThumbsField(upload_to='photo', sizes=((125,125),(200,200)), null=True)
     # will  useful to have the following fields on most things:
@@ -58,16 +57,12 @@ class Job(models.Model): # job in the 'piece of work history' sense, not a job a
 
 class Advert(models.Model): # "Jobs"
     creating_user = models.ForeignKey(User, related_name='advert_user')
-
     city = models.CharField(max_length=255, blank=True, null=True) # why 255? -> mySQL limit
     country = models.CharField(max_length=255, blank=True, null=True)
-
     title = models.CharField(max_length=255, blank=True, null=True)
     description = models.CharField(max_length=255, blank=True, null=True)
     reference = models.CharField(max_length=255, blank=True, null=True) #the reference for the company advertising?
-    
     closing_date = models.DateTimeField()
-    
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
     
@@ -77,18 +72,16 @@ class Advert(models.Model): # "Jobs"
 class Event(models.Model):
     # foreign key should be to the user who created the original Event
     creating_user = models.ForeignKey(User, related_name='event_user')
-
     # location - may need to change this one.
     street = models.CharField(max_length=255, blank=True, null=True) # i.e street, road, lane, drive, etc... with a house/flat number
     city = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
-
     title = models.CharField(max_length=255, blank=True, null=True)
     description = models.CharField(max_length=255, blank=True, null=True)
     event_type = models.CharField(max_length=255, blank=True, null=True) # event type? pre-defined things such as 'Staff' + 'Public' or anything? may want to change this
-
-    event_date = models.DateTimeField()
-    
+    year = models.IntegerField(blank=True, null=True)
+    month = models.IntegerField(blank=True, null=True)
+    day = models.IntegerField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
     
