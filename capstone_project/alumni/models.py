@@ -32,7 +32,6 @@ class Profile(models.Model):
     grad_year = models.IntegerField(blank=True, null=True)
     degree = models.CharField(max_length=255, blank=True, null=True)
     #company = models.CharField(max_length=255, blank=True, null=True)
-
     #grad_year as DeciminalField(maxDigits = 4)?
     #photo = ImageWithThumbsField(upload_to='photo', sizes=((125,125),(200,200)), null=True)
     # will  useful to have the following fields on most things:
@@ -61,26 +60,24 @@ class Job(models.Model): # job in the 'piece of work history' sense, not a job a
 
 class Advert(models.Model): # "Jobs" # allow for anyone to post a job advert for now?
     creating_user = models.ForeignKey(User, related_name='advert_user')
-
     city = models.CharField(max_length=255, blank=True, null=True) # why 255? -> mySQL limit
     country = models.CharField(max_length=255, blank=True, null=True)
-
     title = models.CharField(max_length=255, blank=True, null=True)
+
     description = models.CharField(
         max_length=255, 
         blank=True, 
         null=True, # TODO: don't allow null - need to add sensible error displays to the user if they screw up here 
         help_text="A full description of the job to be advertised.")
     reference = models.CharField(max_length=255, blank=True, null=True) # the reference for the company advertising
-    
+
     closing_date = models.DateTimeField()
-    
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
     
     annual_salary = models.DecimalField(
             max_digits=15, # 15 figures to allow for the stupidly-rich / devasting hyperinflation
-            decimal_places=3,
+            decimal_places=2,
             help_text="Please note that annual salary is measured as total cost to company (in ZAR).",
             default = Decimal('0.00') # arguably a sensible default? 
             )
@@ -96,18 +93,16 @@ class Advert(models.Model): # "Jobs" # allow for anyone to post a job advert for
 class Event(models.Model):
     # foreign key should be to the user who created the original Event
     creating_user = models.ForeignKey(User, related_name='event_user')
-
     # location - may need to change this one.
     street = models.CharField(max_length=255, blank=True, null=True) # i.e street, road, lane, drive, etc... with a house/flat number
     city = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
-
     title = models.CharField(max_length=255, blank=True, null=True)
     description = models.CharField(max_length=255, blank=True, null=True)
     event_type = models.CharField(max_length=255, blank=True, null=True) # event type? pre-defined things such as 'Staff' + 'Public' or anything? may want to change this
-
-    event_date = models.DateTimeField()
-    
+    year = models.IntegerField(blank=True, null=True)
+    month = models.IntegerField(blank=True, null=True)
+    day = models.IntegerField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
     
@@ -171,7 +166,7 @@ class Thread(models.Model):
     def alt_newthread_url(self):
         key = self.forum.pk
         urlpath = r"/alumni/new_thread/" + string(key) + r"/"
-        return (urlpath)
+        return urlpath
 
     def __unicode__(self):
         return self.title
