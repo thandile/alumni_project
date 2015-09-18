@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from smtplib import SMTP
 
 #import socket
 
@@ -84,6 +85,17 @@ DATABASES = {
         'PASSWORD': 'redtablefan', # redtablefan
     }
 }
+
+
+#email set up
+'''EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'csalumniuct@gmail.com'
+EMAIL_HOST_PASSWORD = 'alumniteam4'
+DEFAULT_FROM_EMAIL= 'csalumniuct@gmail.com'
+SERVER_EMAIL ='csalumniuct@gmail.com'
+EMAIL_PORT = 587'''
 
 
 # Internationalization

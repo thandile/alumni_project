@@ -37,6 +37,7 @@ class EditProfileForm(forms.Form):
      grad_year = forms.IntegerField(label= "Graduation Year")
      city = forms.CharField(max_length=50)
      country = forms.CharField(max_length=50)
+	 
 class PostForm(forms.ModelForm):
     class Meta:
         model = models.Post
@@ -133,7 +134,7 @@ def create_new_thread():
 # e.g. a list view will be something like templates/alumni/forum_list.html (templates/appname/model_list.html)
 
 def logout_view(request):
-    logout(request)s
+    logout(request)
 
 def create_profile(request):  #create profile
     user = User.objects.latest('pk')
