@@ -20,16 +20,26 @@ urlpatterns = [
 	url(r'^forum/(?P<forum_pk>[0-9]+)/$', views.forum, name = 'forum'),	
 	
 	url(r'^thread/(?P<thread_pk>[0-9]+)/$', views.thread, name = 'thread'),	
-	
-	url(r'^new_thread/(?P<forum_pk>[0-9]+)/$', views.create_new_thread, name = "new_thread"),
+
+	#url(r'^thread/(?P<forum_pk>[0-9]+)/new/$', views.create_new_thread, name = 'create_new_thread'),	
+    # url(r'^new_thread/$', views.create_new_thread, name = 'create_new_thread'),	
+
+	#url(r'^thread/new/$', views.create_new_thread, name = 'create_new_thread'),	
+    
+    #url(r'^thread/new/(?P<forum_pk>[0-9]+)$', views.create_new_thread, name = 'create_new_thread'), #, {'forum_pk': 'forum_pk'}),	
+    url(r'^new_thread/(?P<forum_pk>[0-9]+)/$', views.create_new_thread, name = "create_new_thread"),
+    #url(r'^new_thread/$', views.create_new_thread, name = "create_new_thread"),
 
 	url(r'^post/(?P<thread_pk>[0-9]+)/$', views.post, name = "new_post"), # idea here is for creating a new post, NOT a listing of posts like the above
-
     url(r'^profile/$', views.create_profile, name='create_profile'),
     url(r'^login/$', views.log_in, name='login'),
     url(r'^userprofile/$', views.profile, name='user_profile'),
-    url(r'^home/$', views.home, name='home'),
     url(r'^editProfile/$',views.view_profile, name ='view_profile'),
+
+    url(r'^careers/$',views.careers, name ='careers'),
+	url(r'^advert/(?P<advert_pk>[0-9]+)/$',views.advert_details, name ='advert_details'),
+    url(r'^advert/$',views.advert, name ='advert'),
+
 	# url(r'^thread/(?P<forum_pk>[0-9]+)/$', views.postthread, name = 'postthread'),	
 	# url(r"^thread/(\d+)/$", views.create, name = 'thread'),
 ]
@@ -41,7 +51,6 @@ urlpatterns = [
 (r"^forum/(\d+)/$", "forum"), <- nope.
 (r"^thread/(\d+)/$", "thread"),
 '''
-
 '''
 (r"^post/(new_thread|reply)/(\d+)/$", "post"),
 (r"^reply/(\d+)/$", "reply"),

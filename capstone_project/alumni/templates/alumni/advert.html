@@ -1,0 +1,13 @@
+<form method="post" action="">
+    {% csrf_token %}
+    <!--{{ form }}-->
+    {% for field in form %}
+		<tr>
+		    <td>{{ field.label_tag }}</td>
+		    <!--<td>{{ field.help_text }}</td>-->
+		    <td>{{ field }}</td>
+        </tr>
+    {% endfor %}
+    <input type="submit" value="Post new career advertisment." />
+    <td> {{form.annual_salary.help_text}} <td/>
+</form>

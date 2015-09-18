@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from decimal import Decimal
 
-
-# GRSJAR001, Jarryd Garisch, 08/08/2015
+# GRSJAR001, Jarryd Garisch, 16/09/2015
 
 '''
 # https://docs.djangoproject.com/en/1.8/topics/auth/default/
@@ -16,11 +16,14 @@ from django.core.urlresolvers import reverse
 in django there is just 'User', to create a superuser change permissions on this object instead of using a child of user
 '''
 
+'''TODO
+jg - complete forum, job advertisements
+report... implementation, 'program validation and verification'
+'''
+
 '''
 Solid, up-to-date, reference: http://riceball.com/d/content/django-18-minimal-application-using-generic-class-based-views
-
 '''
-
 
 class Profile(models.Model):
     user = models.ForeignKey(User, related_name='user_obj')
@@ -56,23 +59,39 @@ class Job(models.Model): # job in the 'piece of work history' sense, not a job a
     def __unicode__(self):
         return str(self.company_name) + ', '+ str(self.job_desc) + ', ' +str(self.job_title)
 
-class Advert(models.Model): # "Jobs"
+class Advert(models.Model): # "Jobs" # allow for anyone to post a job advert for now?
     creating_user = models.ForeignKey(User, related_name='advert_user')
 
     city = models.CharField(max_length=255, blank=True, null=True) # why 255? -> mySQL limit
     country = models.CharField(max_length=255, blank=True, null=True)
 
     title = models.CharField(max_length=255, blank=True, null=True)
-    description = models.CharField(max_length=255, blank=True, null=True)
-    reference = models.CharField(max_length=255, blank=True, null=True) #the reference for the company advertising?
+    description = models.CharField(
+        max_length=255, 
+        blank=True, 
+        null=True, # TODO: don't allow null - need to add sensible error displays to the user if they screw up here 
+        help_text="A full description of the job to be advertised.")
+    reference = models.CharField(max_length=255, blank=True, null=True) # the reference for the company advertising
     
     closing_date = models.DateTimeField()
     
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
     
+    annual_salary = models.DecimalField(
+            max_digits=15, # 15 figures to allow for the stupidly-rich / devasting hyperinflation
+            decimal_places=3,
+            help_text="Please note that annual salary is measured as total cost to company (in ZAR).",
+            default = Decimal('0.00') # arguably a sensible default? 
+            )
+
     def __unicode__(self):
         return str(self.title) + ', ' + str(self.description)
+
+    def get_absolute_url(self):
+        '''displays a particular adverts'''
+        return reverse('alumni.views.advert_details', kwargs={'advert_pk':self.pk})
+
 
 class Event(models.Model):
     # foreign key should be to the user who created the original Event
@@ -95,11 +114,14 @@ class Event(models.Model):
     def __unicode__(self):
         return str(self.title) + ', ' + str(self.description)
 
-
 # Forum, Thread + Post makes sense - see here: http://lightbird.net/dbe/forum1.html
 # A forum has many threads. Each thread has many posts.
 class Forum(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
+
+    # 'forum-type' could be implemented as 'traditional' vs 'facebook'
+    # i.e. facebook's wall is just a forum with threads and posts presented differently
+    # vanilla forum is 'traditional' and a forum that is attached to someone's public profile page is a wall
 
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
@@ -123,7 +145,7 @@ class Thread(models.Model):
 
     forum = models.ForeignKey(Forum)
     creating_user = models.ForeignKey(User, related_name='thread_user')
-    
+
     # thread functions
     def get_num_posts(self):
         # count the number of posts in *this* particular thread
@@ -143,6 +165,14 @@ class Thread(models.Model):
     def get_absolute_url(self):
         return reverse('alumni.views.thread', kwargs={'thread_pk':self.pk})
 
+    def get_absolute_newthread_url(self):
+        return reverse('alumni.views.create_new_thread', kwargs={'thread_pk':self.forum.pk})
+
+    def alt_newthread_url(self):
+        key = self.forum.pk
+        urlpath = r"/alumni/new_thread/" + string(key) + r"/"
+        return (urlpath)
+
     def __unicode__(self):
         return self.title
 
@@ -152,7 +182,7 @@ class Post(models.Model):
     thread = models.ForeignKey(Thread)
     creating_user = models.ForeignKey(User, related_name='post_user')
     
-    text = models.TextField(max_length=10000) # The actual contents of the post itself. TEXT ONLY for now!
+    text = models.TextField(max_length=10000) # The actual contents of the post itself. text only
 
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)

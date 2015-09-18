@@ -10,6 +10,9 @@ Version    : 1.0
 Released   : 20130903
 
 -->
+
+<!-- careers in the site banner -->
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -35,7 +38,7 @@ Released   : 20130903
         <div id="menu">
             <ul>
                 <li class="icon icon-ok current_page_item"><a href="/alumni/home/" accesskey="1" title="">Homepage</a></li>
-                <li class="icon icon-ok"><a href="#" accesskey="2" title="">Your Profile</a></li>
+                <li class="icon icon-ok"><a href="/alumni/userprofile/" accesskey="2" title="">Your Profile</a></li>
                 <li class="icon icon-ok"><a href="#" accesskey="3" title="">Events</a></li>
                 <li class="icon icon-ok"><a href="{{advert.get_absolute_url}}" accesskey="4" title="">Careers</a></li>
                 <li class="icon icon-ok"><a href="/alumni/main/" accesskey="5" title="">Forums</a></li>
@@ -44,40 +47,38 @@ Released   : 20130903
         </div>
     </div>
 </div>
+<!--'body' of web page goes here:-->
 <div id="wrapper">
     <div id="page" class="container">
         <div id="content">
-
-<!-- add button to create a new thread in 'this' forum -->
-<!-- <a class="button" href= "{{thread.get_absolute_newthread_url}}">Create New Thread</a> -->
-<!--<a class="button" href= "/alumni/new_thread" >Create New Thread</a> -->
-<a class="button" href= "{{thread.alt_newthread_url}}">Create New Thread</a>
-
+    
+<td>  <a class="button" href="/alumni/advert/">Post New Advert</a>  </td>
+    
 <div id="list">
 <table border="0" cellpadding="4" width="100%">
+<!-- see looping of forums in html, can loop across job listings in a similar way and use the paginator to display them nicely -->
     <tr>
-        <td>Title</td>
-        <td>Author</td>
         <td></td>
-        <!--<td></td>-->
+        <td>Title</td>
+        <td></td>
     </tr>
 
-    {% for thread in threads.object_list %}
+    {% for advert in adverts.object_list %}
     {% csrf_token %}
-    
     <tr>
         <td {% if forloop.last %}class="last"{% endif %}>
-        <div class="title"> <a href="{{thread.get_absolute_url}}"> {{ thread.title }}</a>
+        <div class="title"> <a href="{{advert.get_absolute_url}}"> {{ advert.title }}</a>
         </div></td>
-        <td {% if forloop.last %}class="last"{% endif %}>{{ thread.creating_user}}</td>
+        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.company}}</td>
+
+        <!-- other advert info fields? -->
+
         <td {% if forloop.last %}class="last"{% endif %}>
-            <a class="button" href="{{thread.get_absolute_url}}">View Thread</a>
+            <a class="button" href="{{advert.get_absolute_url}}">View Advert Details</a>
         </td>
     </tr>
-
     {% endfor %}
 </div>
-
 </h3>
         </div>
     </div>

@@ -2,11 +2,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.contrib.auth import authenticate
-from django.contrib.auth import login, logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 # edit this::
-from alumni.models import Profile as Profile
+from alumni.models import Profile, Advert
 from alumni import models
 from django.http import HttpResponseRedirect
 from django import forms
@@ -23,7 +22,6 @@ class UserForm(forms.Form):
         first_name = forms.CharField(max_length=50, label = "first name")
         last_name = forms.CharField(max_length=50, label = "last name")
 
-
 class ProfileForm(forms.Form):
         degree = forms.CharField(max_length=50)
         grad_year = forms.IntegerField(label= "graduation year")
@@ -32,14 +30,31 @@ class ProfileForm(forms.Form):
 
 class PostForm(forms.ModelForm):
     class Meta:
-        model = models.Post
-        fields = ('title', 'text')
+        model = models.Post # forms.ModelForm allows for creation of form based on the object's definition in models. (because it's a ModelForm it uses this metadata)
+        # using sensible help_text tags in the model object itself, since they'll be displayed to the html form with this method 
+        fields = ('title', 'text') # specify the fields of Post model actually desired in this form
+
+# TODO
+# NB - current implementation being built requires a thread to be created AND a post to be created seperately
+# If a user is creating a new thread, then it would be sensible to have a form that will produce BOTH A THREAD AND A POST at the same time!
+# useful reference: http://stackoverflow.com/questions/15889794/creating-one-django-form-to-save-two-models
+class ThreadForm(forms.ModelForm):
+    class Meta:
+        model = models.Thread
+        # note forum should be automatically deduced (i.e. NOT a form field), since threads can only be made within forum x
+        fields = ('title',) 
+
+class AdvertForm(forms.ModelForm):
+    class Meta:
+        model = models.Advert
+        # fields like creating user, created date, last_updated_date should be automatically figured and NOT presented to the user on the form!
+        fields = ('title', 'description', 'annual_salary', 'description', 'closing_date','reference')
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=50)
     password = forms.CharField(max_length=32, widget=forms.PasswordInput)
 
-def create(request):
+def create(request): # create_user
     form = UserForm()
     if request.method == "POST":
 		# then they are sending data, create a new user
@@ -57,7 +72,7 @@ def create(request):
     return render(request, '../templates/alumni/create.html', {'form': form})
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the alumni index.")
+    return HttpResponse("Hello, world. You're at the alumni index.") # TODO: get rid of this!
 
 def main(request):
     # Main listing - all forums
@@ -68,6 +83,29 @@ def add_csrf(request, **kwargs):
     d = dict(user=request.user, ** kwargs)
     d.update(csrf(request))
     return d
+
+def advert(request): # (i.e. post a single advert)
+    if request.method == "POST":
+        form = AdvertForm(request.POST)
+        if form.is_valid():
+            advert = Advert(**form.cleaned_data)
+            advert.creating_user = request.user
+            # redirect them back to careers listing
+            # return render_to_response("../templates/alumni/careers.html", add_csrf(request, adverts=adverts))
+            advert.save()
+            return careers(request)
+    else:
+        form = AdvertForm()
+    return render(request, "../templates/alumni/advert.html", add_csrf(request, form = form))
+
+def advert_details(request, advert_pk):
+    advert = models.Advert.objects.filter(pk=advert_pk)[0]
+    return render_to_response("../templates/alumni/advertDetails.html", add_csrf(request, advert = advert))
+
+def careers(request): # jobAdverts / careers (list of them)
+    adverts = models.Advert.objects.all()
+    adverts = make_paginator(request, adverts, 20)
+    return render_to_response("../templates/alumni/careers.html", add_csrf(request, adverts=adverts))
 
 def make_paginator(request, items, num_items):
     # Make a generic paginator usable at forum level / thread level / and on other objects 
@@ -80,6 +118,8 @@ def make_paginator(request, items, num_items):
         items = paginator.page(paginator.num_pages)
     return items
 
+# intentionally only allow for new forums to be created via the admin web backend. we need to dictate the terms of the discourse!
+# regular joe users should be allowed to create threads and posts within the exsisting forums (of course)
 def forum(request, forum_pk):
     # listing of threads in a particular forum
     threads = models.Thread.objects.filter(forum=forum_pk).order_by("-created_date")
@@ -89,12 +129,13 @@ def forum(request, forum_pk):
 
 def thread(request, thread_pk):
     # listing of threads in a particular forum
-    posts = models.Post.objects.filter(thread=thread_pk).order_by("-created_date")
+    posts = models.Post.objects.filter(thread=thread_pk).order_by("created_date")
     posts = make_paginator(request, posts, 20)
     #return render(response, "../templates/alumni/thread.html", add_csrf(request, posts=posts, pk=thread_pk))
     return render_to_response("../templates/alumni/thread.html", add_csrf(request, posts=posts, pk=thread_pk))
 
-# don't need a post listing function here, posts are NOT urls! Do have a new post function though
+# don't need a post listing function here, posts are not individual urls here, just a components of thread urls 
+# the post function is used for creating a post however
 def post(request, thread_pk):
     form = PostForm()
     thread = models.Thread.objects.filter(pk=thread_pk)[0]
@@ -106,19 +147,41 @@ def post(request, thread_pk):
             post.thread = thread # not a form input
             post.creating_user = request.user
             post.save()
-
-            # DRY violation, but thread object not callable? fix this later
-            posts = models.Post.objects.filter(thread=thread_pk).order_by("-created_date")
+            
+            # DRY violation, but thread object not callable? better way?
+            posts = models.Post.objects.filter(thread=thread_pk).order_by("created_date") # want most recent threads first, but posts should be chronological
             posts = make_paginator(request, posts, 20)
             return render_to_response("../templates/alumni/thread.html", add_csrf(request, posts=posts, pk=thread_pk))
-            #return thread(request, thread_pk)
+            
+            # return thread(request, thread.pk)
     else:
-        # they are requesting the page, give 
+        # they are requesting the page / they want to post some classic vitriol
         form = PostForm()
     return render(request, '../templates/alumni/newpost.html', {'form': form})
 
-def create_new_thread():
-    return HttpResponse("TODO.")
+def create_new_thread(request, forum_pk):
+    # creates a thread *and* an initial post in that thread
+    forum = models.Forum.objects.filter(pk=forum_pk)[0]
+    if request.method == "POST":
+        thread_form = ThreadForm(request.POST)
+        post_form = PostForm(request.POST)
+        if thread_form.is_valid() and post_form.is_valid():
+            thread = models.Thread(**thread_form.cleaned_data)
+            thread.forum = forum
+            thread.creating_user = request.user
+            thread.save()
+            post = models.Post(*post_form.cleaned_data)
+            post.thread = thread
+            post.creating_user = request.user
+            post.save()
+            # go into the newly made thread
+            return thread(request, thread.pk)
+    else:
+        thread_form = ThreadForm()
+        post_form = PostForm()
+    # url_path = '../templates/alumni/newthread'+ forum.pk +'.html'
+    return render(request, '../templates/alumni/newthread.html', {'thread_form': thread_form, 'post_form': post_form})
+    # return render(request, url_path, {'thread_form': thread_form, 'post_form': post_form})
 
 # Django's CreateView, ListView, UpdateView and DeleteView should be used for posting new threads, comments, etc...
 # these use 'default' names for their html templates 
@@ -132,7 +195,6 @@ def create_profile(request):  #create profile
     user = User.objects.latest('pk')
     prof_form = ProfileForm()
     if request.method == "POST":
-
         prof_form = ProfileForm(request.POST)
         profile = Profile(city = request.POST.get("city"), country = request.POST.get("country"),
                     degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"),
@@ -172,7 +234,6 @@ def view_profile(request):
     user = User.objects.latest('pk')
     prof_form = ProfileForm()
     if request.method == "POST":
-
         prof_form = ProfileForm(request.POST)
         profile = Profile(city = request.POST.get("city"), country = request.POST.get("country"),
                     degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"),
