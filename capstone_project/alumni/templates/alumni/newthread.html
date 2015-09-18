@@ -1,6 +1,7 @@
 <form method="post" action="">
     {% csrf_token %}
     {{ thread_form }}
+    <!-- could display a post form and create the thread to match the post title insteads -->
     {{ post_form }}
     <input type="submit" value="Make new thread" />
 </form> 

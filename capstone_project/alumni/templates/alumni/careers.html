@@ -58,8 +58,9 @@ Released   : 20130903
 <table border="0" cellpadding="4" width="100%">
 <!-- see looping of forums in html, can loop across job listings in a similar way and use the paginator to display them nicely -->
     <tr>
-        <td></td>
         <td>Title</td>
+        <td>Description</td>
+        <td>Annual Package (ZAR)</td>
         <td></td>
     </tr>
 
@@ -69,8 +70,8 @@ Released   : 20130903
         <td {% if forloop.last %}class="last"{% endif %}>
         <div class="title"> <a href="{{advert.get_absolute_url}}"> {{ advert.title }}</a>
         </div></td>
-        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.company}}</td>
-
+        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.description}}</td>
+        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.annual_salary}}</td>
         <!-- other advert info fields? -->
 
         <td {% if forloop.last %}class="last"{% endif %}>

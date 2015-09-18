@@ -323,7 +323,6 @@ def log_in(request):
 def home(request):
     return render(request, '../templates/alumni/homepage.html')
 
-
 def create_events(request):  #create events
     if request.method == "POST":
         user = request.user
@@ -377,7 +376,6 @@ def events_view(request, id):   #view selected event
                                                                       'description':description, 'year': year, \
                                                                       'month':month, 'day':day, 'street':street, \
                                                                       'city':city, 'country':country})
-
 
 def events_delete(request, id):
     if request.method == "POST" and request.POST.get('delete'):
