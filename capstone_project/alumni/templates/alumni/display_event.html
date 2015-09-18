@@ -60,9 +60,11 @@ Released   : 20130903
                 <p>City: {{ city }}</p>
                 <p>Country: {{ country }}</p>
 
+
 				<form method="post" action="" align="right" >
 				{% csrf_token %}
-                <input type="submit" name="delete" value="Delete Event" formaction="/alumni/events/delete/{{ id }}/"/>        <input type="submit" name="edit" value="Edit Event" formaction="/alumni/events/edit/{{ id }}/"/>
+                <input type="submit" name="delete" value="Delete Event" formaction="/alumni/events/delete/{{ id }}/"/>
+					<input type="submit" name="edit" value="Edit Event" formaction="/alumni/events/edit/{{ id }}/"/>
 				</form>
              </h3>
 

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import *
 import datetime,calendar
 from datetime import  date
@@ -164,7 +165,9 @@ def create_new_thread():
 # e.g. a list view will be something like templates/alumni/forum_list.html (templates/appname/model_list.html)
 
 def logout_view(request):
+    #if request.method == "POST":
     logout(request)
+    return render(request, '../templates/alumni/login.html')
 
 def create_profile(request):  #create profile
     user = User.objects.latest('pk')
@@ -261,7 +264,7 @@ def home(request):
     return render(request, '../templates/alumni/homepage.html')
 
 
-def create_events(request):
+def create_events(request):  #create events
     if request.method == "POST":
         user = request.user
         events = EventsForm(request.POST)
@@ -277,7 +280,7 @@ def create_events(request):
         event = Event(creating_user = user, title = title, event_type = event_type, description = description, \
                       year = year, month = month, day = day, street = street, city = city, country = country)
         event.save()
-        return render(request, '../templates/alumni/display_event.html', { 'title':title, 'event_type':event_type, \
+        return render(request, '../templates/alumni/display_event.html', { 'id' : event.id, 'title':title, 'event_type':event_type, \
                                                                           'description':description, 'year': year, \
                                                                         'month':month, 'day':day, 'street':street,\
                                                                           'city':city, 'country':country})
@@ -286,7 +289,7 @@ def create_events(request):
         return render(request, '../templates/alumni/create_event.html', {'form':events})
 
 
-def events(request):
+def events(request):  #display events
     if request.method == "POST" and request.POST.get('delete'):
         obj = Event.objects.get(pk=id)
         #if request.user == obj.creating_user:  delete only if creating user
@@ -316,7 +319,6 @@ def events_view(request, id):   #view selected event
                                                                       'city':city, 'country':country})
 
 
-
 def events_delete(request, id):
     if request.method == "POST" and request.POST.get('delete'):
         obj = Event.objects.get(pk=id)
@@ -328,18 +330,38 @@ def events_delete(request, id):
         event = Event.objects.all()
         return render(request, '../templates/alumni/events.html', {'events':event})
 
+
 def events_edit(request, id):    #complete editing
-    if request.method == "POST":
+    if request.method == "POST" and request.POST.get('edit'):
+
+       # event = EventsForm(request.POST)
+       # events = EventsForm(initial={'title' : title, 'event type' : event_type, 'description' : description, \
+                                     #'year' : year, 'month' : month, 'day' : day, 'street' : street, 'city' : city, \
+                                     #'counry' : country})
+       # return render(request, '../templates/alumni/display_event.html')
+    #else:
         event = Event.objects.get(pk=id)
-        title = event.title
-        event_type = event.event_type
-        description = event.description
-        year = event.year
-        month = event.month
-        day = event.month
-        street = event.street
-        city = event.street
-        country = event.country
-        return render(request, '../templates/alumni/display_event.html', {'events':event})
-    else:
-        return render(request, '../templates/alumni/edit_event.html')
+        event = EventsForm(initial={'title' : event.title, 'event type' : event.event_type, 'description' : event.description, \
+                                     'year' : event.year, 'month' : event.month, 'day' : event.day, \
+                                    'street' : event.street, 'city' : event.city, \
+                                     'counry' : event.country})
+        return render(request, '../templates/alumni/edit_event.html', {'form' : event})
+    elif request.method == "POST" and request.POST.get('save'):
+        user = request.user
+        events = EventsForm(request.POST)
+        title = request.POST['title']
+        event_type = request.POST['event_type']
+        description = request.POST['description']
+        year = request.POST['year']
+        month = request.POST['month']
+        day = request.POST['day']
+        street = request.POST['street']
+        city = request.POST['city']
+        country = request.POST['country']
+        event = Event(creating_user = user, title = title, event_type = event_type, description = description, \
+                      year = year, month = month, day = day, street = street, city = city, country = country)
+        event.save()
+        return render(request, '../templates/alumni/display_event.html', { 'id' : event.id, 'title':title, 'event_type':event_type, \
+                                                                          'description':description, 'year': year, \
+                                                                        'month':month, 'day':day, 'street':street,\
+                                                                          'city':city, 'country':country})

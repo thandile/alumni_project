@@ -55,7 +55,7 @@ Released   : 20130903
 					<h3>
 			<form method="post" action="" enctype="multipart/form-data">
 				{% csrf_token %}
-				{{ signupForm.as_p }}
+				{{ signupForm.as_table }}
 
 				<input type="submit" name="newUser" value="Create new user account" />
 			</form>

@@ -47,23 +47,17 @@ Released   : 20130903
 
 <div id="wrapper">
 	<div id="page" class="container">
+
 		<div id="content">
-			<p><a href="/alumni/events/" >Back to Events </a></p>
 			<h3>
 
-                
-                <p>Title: {{ title }}</p>
-                <p>Event Type: {{ event_type }}</p>
-                <p>Description: {{ description }}</p>
-                <p>Date: {{ year }}-{{ month }}-{{ day }} </p>
-                <p>Street: {{ street }}</p>
-                <p>City: {{ city }}</p>
-                <p>Country: {{ country }}</p>
-
-				<form method="post" action="" align="right" >
+            <form method="post" action="" enctype="multipart/form-data">
 				{% csrf_token %}
-                <input type="submit" name="delete" value="Delete Event" formaction="/alumni/events/delete/{{ id }}/"/>        <input type="submit" name="edit" value="Edit Event" formaction="/alumni/events/edit/{{ id }}/"/>
-				</form>
+				{{ form.as_p}}
+				<input type="submit" name="save" value="Save Event" />
+			</form>
+
+
              </h3>
 
 		</div>

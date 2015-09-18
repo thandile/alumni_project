@@ -23,6 +23,7 @@ urlpatterns = [
     # idea here is for creating a new post, NOT a listing of posts like the above
     url(r'^profile/$', views.create_profile, name='create_profile'),
     url(r'^login/$', views.log_in, name='login'),
+    url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^user_profile/$', views.profile, name='user_profile'),
     url(r'^home/$', views.home, name='home'),
     url(r'^edit_profile/$', views.view_profile, name='view_profile'),
