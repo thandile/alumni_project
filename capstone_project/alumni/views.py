@@ -235,6 +235,50 @@ def spam_those_poor_suckers(subject, message, from_email = None, suckers = None)
     send_mass_mail(datatuple)
     '''
 
+# display the editProfile form of some user Y to some user X. User X can 'suggest' what the field values should be
+# user Y gets a email with the suggested edits and is invited to go update their profile 
+# could (somehow) possible give user Y option to approve changes instead of having them edit it manually? ...
+def send_proxy_info(request, editee_id):
+    # editee - i.e. receiver of the edits
+    editee = User.objects.get(pk=editee_id)
+    editee_profile = Profile.objects.get(user_id=editee_id)
+    name = editee.first_name
+    surname = editee.last_name
+    email = editee.email
+    city = editee_profile.city
+    country = editee_profile.country
+    degree = editee_profile.degree
+    grad_year = editee_profile.grad_year
+    edit_form = EditProfileForm(request.POST or None, initial={'name' : name, 'surname' : surname, 'email' : email, 'city': city, "country": country, "degree" : degree, "grad_year": grad_year})
+
+    if request.method == "POST":
+        if edit_form.is_valid():
+
+            editee.name = request.POST['first_name']
+            editee.surname = request.POST['surname']
+            editee.email = request.POST['email']
+            editee_profile.city = request.POST['city']
+            editee_profile.country = request.POST['country']
+            editee_profile.degree = request.POST['degree']
+            editee_profile.grad_year = request.POST['grad_year']
+            # DO NOT SAVE THE EDITED FORM, SEND THE FORM AS AN EMAIL to user X
+            
+            # only email a user about changes if there are actually changes to begin with!
+            if edit_form.has_changed():
+                message = str(request.user.first_name) + " " + str(request.user.last_name) + " has suggested the following changes to your profile: " + '\n\r'
+                for field in edit_form.changed_data:
+                    message += field + edit_form[field] + '\n\r'
+                spam_those_poor_suckers("Suggested edits to your Profile!", message, from_email = None, suckers = [editee] )
+            
+            # for now redirect to the same place as edit_progile would i.e. user Y's detials
+            # may also want to give user X a notification that user Y will get an email !
+            # this could change to go back to 'search listing' however 
+            return HttpResponseRedirect('%s'%(reverse('profile')), context = {"form" : edit_form})
+
+    return render(request, '../templates/alumni/editProfile.html', context)
+
+
+
 def create_profile(request):  #create profile
     user = request.user
     prof_form = ProfileForm()
@@ -330,10 +374,8 @@ def send_email(recipient, subject, body):
 '''
 
 def edit_profile(request):
-
-    user = User.objects.get('pk')
+    #user = User.objects.get('pk')
     user_info = Profile.objects.get(user_id=user.id)
-
     name = user.first_name
     surname = user.last_name
     email = user.email
