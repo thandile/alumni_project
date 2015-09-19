@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.mail import EmailMessage
+
+from django.core.mail import send_mail, send_mass_mail
+
 from django.db import connection
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import *
@@ -222,6 +225,54 @@ def create_new_thread(request, forum_pk):
     #logout(request)
     #return render(request, '../templates/alumni/login.html', {'form' : form})
 
+'''
+def send_email(recipient, subject, body):
+    import smtplib
+    sender = 'csalumniuct@gmail.com'
+    password = 'alumniteam4'
+    to = [recipient]
+    subject = subject
+    text = body
+
+    message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
+    """ % (sender, ", ".join(to), subject, text)
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.ehlo()
+        server.starttls()
+        server.login(sender, password)
+        server.sendmail(sender, to, message)
+        server.close()
+        print ('successfully sent the mail')
+    except:
+        print ("failed to send mail")
+'''
+def spam_those_poor_suckers(subject, message, from_email = None, suckers = None):
+    # a function to send mass emails to users
+    if from_email is None:
+        from_email = r'unreachable@dontbother.com'
+    if suckers is None:
+        suckers = models.User.objects.all()
+    # make a list of emails from 'suckers' (i.e. recipient_list)
+    recipients = []
+    for spamee in suckers:
+        recipients.append(spamee.email)
+        spamee.email_user(subject, message)
+    '''
+    print recipients, type(recipients)
+    # send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None)
+    # datatuple is a tuple in which each element is in this format: (subject, message, from_email, recipient_list)
+    datatuple = (subject, message, from_email, recipients)
+    send_mass_mail(datatuple)
+    '''
+
+def newsfeed(request, num_items):
+    # get's latest 'num_items' events and adverts (could also add forum posts)
+    events = models.Events.objects.all().order_by('created_date')[:num_items]
+    adverts = models.Adverts.objects.all().order_by('created_date')[:num_items]
+    # posts = models.Posts.objects.all().order_by('created_date')
+    return render(request, '../templates/alumni/newsfeed.html', {'events':events, 'adverts' : adverts})
+
 def create_profile(request):  #create profile
     user = request.user
     prof_form = ProfileForm()
@@ -376,8 +427,9 @@ def log_in(request):
             password = request.POST['password']
             user = authenticate(username=username, password=password)
             login(request, user)
-            return render(request, "../templates/alumni/toProfile.html", {'userid' : new_user.id, 'username' : \
-                new_user.first_name})
+            #add_csrf(request, posts=posts, pk=thread_pk)
+            return render(request, "../templates/alumni/toProfile.html", {'userid' : new_user.id, 'username' : new_user.first_name})
+            #return render(request, "../templates/alumni/toProfile.html", add_csrf(request, 'userid'=new_user.id, 'username'=new_user.first_name))
     elif request.method == "GET":
         logout(request)
         log_in = LoginForm()
