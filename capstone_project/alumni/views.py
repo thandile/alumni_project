@@ -32,7 +32,6 @@ class ProfileForm(forms.Form):
         city = forms.CharField(max_length=50)
         country = forms.CharField(max_length=50)
 
-
 class EditProfileForm(forms.Form):
      first_name = forms.CharField(max_length=50, label = "First Name")
      last_name = forms.CharField(max_length=50, label = "Last Name")
@@ -62,8 +61,7 @@ class AdvertForm(forms.ModelForm):
     class Meta:
         model = models.Advert
         # fields like creating user, created date, last_updated_date should be automatically figured and NOT presented to the user on the form!
-        fields = ('title', 'description', 'annual_salary', 'description', 'closing_date','reference')
-
+        fields = ('title', 'description', 'annual_salary', 'description', 'closing_date','contact_details', 'reference', )
 
 class LoginForm(forms.Form):
     email = forms.EmailField(max_length=50)
@@ -77,14 +75,12 @@ class EventsForm(forms.Form):
     month = forms.ChoiceField(choices = [('1','January'),('2','February'),('3', 'March'),('4','April'),('5','May'),\
                                          ('6','June'),('7','July'),('8', 'August'),('9','September'),('10','October'),\
                                          ('11','November'),('12','December')])
-    day = forms.ChoiceField(choices = [(x,x) for x in range(1970, 2016)])
+    day = forms.ChoiceField(choices = [(x,x) for x in range(1, 31)])
                             #[('1', "Monday"), ('2', 'Tuesday'), ('3', 'Wednesday'), ('4', "Thursday"), \
                                        #('5', "Friday"), ('6', 'Saturday'), ('7', "Sunday")])
     street = forms.CharField(max_length=50)
     city = forms.CharField(max_length=50)
     country = forms.CharField(max_length=50)
-
-
 
 class EditEventsForm(forms.Form):
     title = forms.CharField(max_length=100)
@@ -219,36 +215,9 @@ def create_new_thread(request, forum_pk):
 # http://riceball.com/d/content/django-18-minimal-application-using-generic-class-based-views
 # e.g. a list view will be something like templates/alumni/forum_list.html (templates/appname/model_list.html)
 
-#def logout_view(request):
-    #if request.method == "POST":
-   # form = UserForm()
-    #logout(request)
-    #return render(request, '../templates/alumni/login.html', {'form' : form})
-
-'''
-def send_email(recipient, subject, body):
-    import smtplib
-    sender = 'csalumniuct@gmail.com'
-    password = 'alumniteam4'
-    to = [recipient]
-    subject = subject
-    text = body
-
-    message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (sender, ", ".join(to), subject, text)
-    try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.ehlo()
-        server.starttls()
-        server.login(sender, password)
-        server.sendmail(sender, to, message)
-        server.close()
-        print ('successfully sent the mail')
-    except:
-        print ("failed to send mail")
-'''
 def spam_those_poor_suckers(subject, message, from_email = None, suckers = None):
     # a function to send mass emails to users
+    # see https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for email_user()  
     if from_email is None:
         from_email = r'unreachable@dontbother.com'
     if suckers is None:
@@ -265,13 +234,6 @@ def spam_those_poor_suckers(subject, message, from_email = None, suckers = None)
     datatuple = (subject, message, from_email, recipients)
     send_mass_mail(datatuple)
     '''
-
-def newsfeed(request, num_items):
-    # get's latest 'num_items' events and adverts (could also add forum posts)
-    events = models.Events.objects.all().order_by('created_date')[:num_items]
-    adverts = models.Adverts.objects.all().order_by('created_date')[:num_items]
-    # posts = models.Posts.objects.all().order_by('created_date')
-    return render(request, '../templates/alumni/newsfeed.html', {'events':events, 'adverts' : adverts})
 
 def create_profile(request):  #create profile
     user = request.user
@@ -344,6 +306,7 @@ def view_profile(request):
         return render(request, '../templates/alumni/createProfile.html', {'form': prof_form})
 
 
+'''
 def send_email(recipient, subject, body):
     import smtplib
     sender = 'csalumniuct@gmail.com'
@@ -364,7 +327,7 @@ def send_email(recipient, subject, body):
         print ('successfully sent the mail')
     except:
         print ("failed to send mail")
-
+'''
 
 def edit_profile(request):
 
@@ -435,10 +398,29 @@ def log_in(request):
         log_in = LoginForm()
         sign_up = UserForm()
         return render(request, '../templates/alumni/login.html', {'form':log_in, 'signupForm' : sign_up})
-
-
+'''
+def newsfeed(request, num_items=None):
+    if num_items is None:
+        num_items = 2
+    # get's latest 'num_items' events and adverts (could also add forum posts)
+    events = models.Event.objects.all().order_by('created_date')[:num_items]
+    adverts = models.Advert.objects.all().order_by('created_date')[:num_items]
+    # posts = models.Posts.objects.all().order_by('created_date')
+    return render(request, '../templates/alumni/newsfeed.html', {'events':events, 'adverts' : adverts})
+'''
 def home(request):
-    return render(request, '../templates/alumni/homepage.html')
+    num_items = 3
+    new_events = Event.objects.all().order_by('-created_date')[:num_items]
+    new_adverts = Advert.objects.all().order_by('-created_date')[:num_items]
+    # posts = models.Posts.objects.all().order_by('created_date')[:num_items]
+    new_events = make_paginator(request, new_events, 20)
+    new_adverts = make_paginator(request, new_adverts, 20)
+    #posts = make_paginator(request, posts, 20)
+    return render(request, '../templates/alumni/homepage.html', {'events':new_events, 'adverts' : new_adverts, 'test' : ['HTML','REALLY','SUCKS']})
+    # add_csrf(
+    # return render_to_response('../templates/alumni/homepage.html', add_csrf(request, 'context_events' = new_events, 'context_adverts' = new_adverts))
+    
+
 
 def create_events(request):  #create events
     if request.method == "POST":

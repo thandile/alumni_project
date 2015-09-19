@@ -39,8 +39,8 @@ Released   : 20130903
             <ul>
                 <li class="icon icon-ok current_page_item"><a href="/alumni/home/" accesskey="1" title="">Homepage</a></li>
                 <li class="icon icon-ok"><a href="/alumni/userprofile/" accesskey="2" title="">Your Profile</a></li>
-                <li class="icon icon-ok"><a href="#" accesskey="3" title="">Events</a></li>
-                <li class="icon icon-ok"><a href="{{advert.get_absolute_url}}" accesskey="4" title="">Careers</a></li>
+                <li class="icon icon-ok"><a href="/alumni/events/" accesskey="3" title="">Events</a></li>
+                <li class="icon icon-ok"><a href="/alumni/careers/" accesskey="4" title="">Careers</a></li>
                 <li class="icon icon-ok"><a href="/alumni/main/" accesskey="5" title="">Forums</a></li>
                 <li class="icon icon-ok"><a href="/alumni/login/" accesskey="5" title="">Log Out</a></li>
             </ul>
@@ -55,28 +55,31 @@ Released   : 20130903
 <td>  <a class="button" href="/alumni/advert/">Post New Advert</a>  </td>
     
 <div id="list">
-<table border="0" cellpadding="4" width="100%">
+<table border="0" cellpadding="4" width="165%">
 <!-- see looping of forums in html, can loop across job listings in a similar way and use the paginator to display them nicely -->
     <tr>
         <td>Title</td>
         <td>Description</td>
         <td>Annual Package (ZAR)</td>
-        <td></td>
+        <td>Closing Date</td>
+        <td>Contact Details</td>
+        <td>Reference</td>
     </tr>
 
     {% for advert in adverts.object_list %}
     {% csrf_token %}
     <tr>
         <td {% if forloop.last %}class="last"{% endif %}>
-        <div class="title"> <a href="{{advert.get_absolute_url}}"> {{ advert.title }}</a>
-        </div></td>
-        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.description}}</td>
+        <!--<div class="title"> <a href="{{advert.get_absolute_url}}"> {{ advert.title }}</a></div></td>-->
+        <div class="title"> {{ advert.title }}</a></div></td>
+        <td <div style="width: 400px" {% if forloop.last %}class="last"{% endif %}>{{ advert.description}} </div> </td>
         <td {% if forloop.last %}class="last"{% endif %}>{{ advert.annual_salary}}</td>
+        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.closing_date}}</td>
+        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.contact_details}}</td>
+        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.reference}}</td>
         <!-- other advert info fields? -->
 
-        <td {% if forloop.last %}class="last"{% endif %}>
-            <a class="button" href="{{advert.get_absolute_url}}">View Advert Details</a>
-        </td>
+        <!--<td {% if forloop.last %}class="last"{% endif %}><a class="button" href="{{advert.get_absolute_url}}">View Advert Details</a></td>-->
     </tr>
     {% endfor %}
 </div>
@@ -84,8 +87,11 @@ Released   : 20130903
         </div>
     </div>
 </div>
+</body>
+
+<!-- how to move to bottom of screen? --> 
 <div id="copyright" class="container">
     <p>&copy; Untitled. All rights reserved. | Photos by <a href="http://fotogrph.com/">Fotogrph</a> | Design by <a href="http://templated.co" rel="nofollow">TEMPLATED</a>.</p>
 </div>
-</body>
+
 </html>

@@ -13,8 +13,7 @@ Released   : 20130903
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title></title>
-    {% load staticfiles %}
+{% load staticfiles %}
 <meta name="keywords" content="" />
 <meta name="description" content="" />
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -44,10 +43,72 @@ Released   : 20130903
 		</div>
 	</div>
 </div>
+<div id="wrapper">
+    <div id="page" class="container">
+        <div id="content">
+    <!-- EVENTS component of NEWFEED  -->
+	<div >
+		<h1><a href="/alumni/events/">Latest Events</a></h1>
+	</div>
+		<div id="page" class="container">
+	                {% csrf_token %}
+	                {% for event in events %}
+	                <ul>
+	                    Title: {{ event.title }}<br>
+	                    Date: {{ event.year }}-{{ event.month }}-{{ event.day }}<br>
+	                </ul>
+					<p><a href ="/alumni/events/{{ event.id }}/" value="View Event"> View Event</a></p>
+						{% endfor %}
 
+			</div>
+		</div>
+	</div>
+    <!-- ADVERT component of NEWSFEED -->
+    <div id="page" class="container">
+        <div id="content">
+	<div >
+		<h1><a href="/alumni/careers/">Latest Advertisements</a></h1>
+	</div>
+		<div id="page" class="container">
+	        {% csrf_token %}
+		    <div id="list">
+		    <table border="0" cellpadding="4" width="165%">
+			    <tr>
+			        <td>Title</td>
+			        <td>Description</td>
+			        <td>Annual Package (ZAR)</td>
+			        <td>Closing Date</td>
+			        <td>Contact Details</td>
+			        <td>Reference</td>
+			    </tr>
+
+			    {% for advert in adverts.object_list %}
+			    {% csrf_token %}
+			    <tr>
+			        <td {% if forloop.last %}class="last"{% endif %}>
+			        <!--<div class="title"> <a href="{{advert.get_absolute_url}}"> {{ advert.title }}</a></div></td>-->
+			        <div class="title"> {{ advert.title }}</a></div></td>
+			        <td <div style="width: 400px" {% if forloop.last %}class="last"{% endif %}>{{ advert.description}} </div> </td>
+			        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.annual_salary}}</td>
+			        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.closing_date}}</td>
+			        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.contact_details}}</td>
+			        <td {% if forloop.last %}class="last"{% endif %}>{{ advert.reference}}</td>
+			        <!-- other advert info fields? -->
+
+			        <!--<td {% if forloop.last %}class="last"{% endif %}><a class="button" href="{{advert.get_absolute_url}}">View Advert Details</a></td>-->
+			    </tr>
+			    {% endfor %}
+
+			</div>
+		</div>
+	</div>
+
+
+    </div>
+
+</div>
 		<!-- ****************************************************************************************************************** -->
-
-			<div id="slider">
+		<div id="slider">
 				<a href="#" class="button previous-button"><span class="icon icon-double-angle-left"></span></a>
 				<a href="#" class="button next-button"><span class="icon icon-double-angle-right"></span></a>
 				<div class="viewer">

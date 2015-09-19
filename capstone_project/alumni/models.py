@@ -21,6 +21,8 @@ jg - complete forum, job advertisements
 report... implementation, 'program validation and verification'
 '''
 
+
+
 '''
 Solid, up-to-date, reference: http://riceball.com/d/content/django-18-minimal-application-using-generic-class-based-views
 '''
@@ -60,6 +62,7 @@ class Job(models.Model): # job in the 'piece of work history' sense, not a job a
 
 class Advert(models.Model): # "Jobs" # allow for anyone to post a job advert for now?
     creating_user = models.ForeignKey(User, related_name='advert_user')
+    contact_details = models.EmailField(max_length=255) # need this since the person to contact about the advert might *NOT* be the user creating the advert
     city = models.CharField(max_length=255, blank=True, null=True) # why 255? -> mySQL limit
     country = models.CharField(max_length=255, blank=True, null=True)
     title = models.CharField(max_length=255, blank=True, null=True)
@@ -71,14 +74,14 @@ class Advert(models.Model): # "Jobs" # allow for anyone to post a job advert for
         help_text="A full description of the job to be advertised.")
     reference = models.CharField(max_length=255, blank=True, null=True) # the reference for the company advertising
 
-    closing_date = models.DateTimeField()
+    closing_date = models.DateTimeField(blank=True, null=True) # HS suggests this should be optional!
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
     
     annual_salary = models.DecimalField(
             max_digits=15, # 15 figures to allow for the stupidly-rich / devasting hyperinflation
             decimal_places=2,
-            help_text="Please note that annual salary is measured as total cost to company (in ZAR).",
+            help_text="Gross annual. Please provide further salary details under description.",
             default = Decimal('0.00') # arguably a sensible default? 
             )
 

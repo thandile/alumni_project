@@ -45,6 +45,8 @@ urlpatterns = [
     url(r'^editProfile/$',views.edit_profile, name ='edit_profile'),
     # url(r'^thread/(?P<forum_pk>[0-9]+)/$', views.postthread, name = 'postthread'),
     # url(r"^thread/(\d+)/$", views.create, name = 'thread'),
+    # url(r'^newsfeed/$',views.newsfeed, name ='newsfeed'),
+    
 ]
 
 '''
