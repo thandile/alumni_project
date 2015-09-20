@@ -55,8 +55,8 @@ Released   : 20130903
 			<h3>
 			<form method="post" action="" enctype="multipart/form-data">
 				{% csrf_token %}
-				{{ edit_form.as_p}}
-				<input type="submit" name="save" value="Save Changes" />
+				{{ form.as_p}}
+				<input type="submit" name="save" value="Save Changes" formaction="/alumni/profile/" />
 			</form>
 
 				</h3>

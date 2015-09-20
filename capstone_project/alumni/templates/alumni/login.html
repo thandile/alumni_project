@@ -33,10 +33,10 @@ Released   : 20130903
 			<h1>UCT CS ALUMNI</h1>
 		</div>
 		<div id="menu">
-		<h3><form method="post" action="" align="right" >
+		<h4><form method="post" action="" align="right" font color="white"  >
 				{% csrf_token %}
 				{{ form }}<input type="submit" name="login" value="Log In" />
-			</form></h3>
+			</form></h4>
 		</div>
 	</div>
 </div>
@@ -54,9 +54,8 @@ Released   : 20130903
 					<div class="title"><h1>Sign Up</h1></div>
 					<h3>
 			<form method="post" action="" enctype="multipart/form-data">
-			<p>	{% csrf_token %}
+				{% csrf_token %}
 				{{ signupForm.as_table }}
-				</p>
 				<p><input type="submit" name="newUser" value="Create new user account" /></p>
 			</form>
 			</h3>

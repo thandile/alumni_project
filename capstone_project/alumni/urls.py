@@ -42,7 +42,11 @@ urlpatterns = [
 	url(r'^events/$', views.events, name="events"),
     url(r'^events/delete/(?P<id>\d+)/$', views.events_delete, name="events_delete"),
     url(r'^events/edit/(?P<id>\d+)/$', views.events_edit, name="events_edit"),
-    url(r'^editProfile/$',views.edit_profile, name ='edit_profile'),
+    #url(r'^editProfile/$',views.edit_profile, name ='edit_profile'),
+    #url(r'^editProfile/$',views.edit_profile, name ='edit_profile'),
+    url(r'^profile/edit/(?P<id>\d+)/$', views.edit_profile, name="events_edit"),
+    url(r'^search/$', views.search, name="search"),
+
     # url(r'^thread/(?P<forum_pk>[0-9]+)/$', views.postthread, name = 'postthread'),
     # url(r"^thread/(\d+)/$", views.create, name = 'thread'),
     # url(r'^newsfeed/$',views.newsfeed, name ='newsfeed'),

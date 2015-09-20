@@ -48,17 +48,29 @@ Released   : 20130903
 <div id="wrapper">
 	<div id="page" class="container">
 
-		<div id="content">
+
+	<form method="get" action="/alumni/search/" align="right">
+		<label for="id_q"></label>
+		{% csrf_token %}
+		{{ search }}
+		<input type="text" name="q" id="id_q"/>
+         <input type="submit" value="Submit"/>
+        </form>
+		<div id="content" >
 			<h3>
 			<p>Name: {{ name }} </p>
 			<p>Surname: {{surname }} </p>
 			<p>Email Address: {{ email }} </p>
 			<p>Degree: {{ degree }} </p>
 			<p>Graduation year: {{ grad_year }}</p>
+				<p>City: {{ city }}</p>
 			<p>Country: {{ country }} </p>
-			<p>City: {{ city }}</p>
+
 			<p></p>
-				<p> <a href="/alumni/editProfile/">Edit Profile </a></p>
+				<form method="post" action="" align="right" >
+				{% csrf_token %}
+					<input type="submit" name="edit" value="Edit Profile" formaction="/alumni/profile/edit/{{ id }}/"/>
+				</form>
 				</h3>
 
 		</div>

@@ -48,10 +48,11 @@ Released   : 20130903
 	<div id="page" class="container">
 		<div id="content">
 			<h3>
+				<p>Create your user profile</p>
 			<form method="post" action="" enctype="multipart/form-data">
 				{% csrf_token %}
 				{{ form.as_p}}
-				<input type="submit"  href = value="Create new user profile" />
+				<input type="submit" name="save"  value="Create new user profile" />
 			</form>
 			</h3>
 		</div>
