@@ -29,4 +29,6 @@ class ForumTestCase(TestCase):
         self.assertEqual(testcase_thread_one.get_num_posts(),1)
         self.assertEqual(testcase_thread_one.get_num_posts(),2)
 
+        
+
 

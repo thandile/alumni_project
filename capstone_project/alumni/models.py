@@ -42,6 +42,10 @@ class Profile(models.Model):
 
     def __unicode__(self): # change to __string__ depending on version of python
         return str(self.city) + ', ' + str(self.country) + ', ' + str(self.degree) + ', ' + str(self.grad_year) + ', ' + str(self.user)
+    '''
+    def get_edit_url(self):
+        return 
+    '''
 
 # instead of company on the profile itself, job object linked to a profle
 class Job(models.Model): # job in the 'piece of work history' sense, not a job advert

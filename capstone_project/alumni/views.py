@@ -173,25 +173,51 @@ def search(request):  #searching function
     query_string = ''
     found_entries = None
     found = None
+    
+    searchText = normalize_query(request.GET['q'])
+    
+    print "**************************************************************************************"
+    print "searchText is ", searchText
+    print request.GET['search_item']
+    print "**************************************************************************************"
+    
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET['q']
         if request.GET['search_item'] == "1":
-            entry_query = get_query(query_string, ['first_name', 'email', 'last_name'])
-            found_entries = User.objects.filter(entry_query)
-            found = return_search_items("auth_user", found_entries)
+            # use __in for exact matches and use __contains for "LIKE"
+            matches = User.objects.filter(Q(first_name__contains=searchText) | Q(email__contains=searchText) | Q(last_name__contains=searchText))
+            found = make_paginator(request, matches, 20)
+            #found_entries = User.objects.filter(entry_query)
+            #found = return_search_items("auth_user", found_entries)
+
         if request.GET['search_item'] == "2" or request.GET['search_item'] == "3" or request.GET['search_item'] == "6":
+            '''
             entry_query = get_query(query_string, ['degree', 'grad_year', 'city', 'country'])
             found_entries = Profile.objects.filter(entry_query)
             found =  return_search_items("alumni_profile", found_entries)
+            '''
+            matches = Profile.objects.filter(Q(degree__contains=searchText) | Q(grad_year__contains=searchText) | Q(city__contains=searchText) | Q(country__contains=searchText))
+            '''
+            this is giving problems - I think integers field (grad_year) may need to be checked seperately
+            '''
+            found = make_paginator(request, matches, 20)
         if request.GET['search_item'] == "4":
+            '''
             entry_query = get_query(query_string, ['company_name', 'job_desc', 'job_title'])
             found = found_entries = Job.objects.filter(entry_query)
             found = return_search_items("alumni_job", found_entries)
+            '''
+            matches = Job.objects.filter(Q(company_name__contains=searchText) | Q(job_desc__contains=searchText) | Q(job_title__contains=searchText))
+            found = make_paginator(request, matches, 20)
         if request.GET['search_item'] == "5":
+            '''
             entry_query = get_query(query_string, ['city', 'country', 'title', 'description', 'reference'])
             found_entries = Advert.objects.filter(entry_query)
             found = return_search_items("alumni_advert", found_entries)
-
+            '''
+            matches = Advert.objects.filter(Q(city__contains=searchText) | Q(country__contains=searchText) | Q(title__contains=searchText) | Q(description__contains=searchText) | Q(reference__contains=searchText))
+            found = make_paginator(request, matches, 20)
+    
     return render_to_response('../templates/alumni/search.html',
                           { 'query_string': query_string, 'found_entries': found },
                           context_instance=RequestContext(request))
@@ -396,7 +422,7 @@ def send_proxy_info(request, editee_id):
     return render(request, '../templates/alumni/editProfile.html', context)
 
 
-
+# url(r'^profile/$', views.create_profile, name='create_profile')
 def create_profile(request):  #create profile
     user = request.user
     prof_form = ProfileForm()
@@ -409,7 +435,7 @@ def create_profile(request):  #create profile
 
         #send email
         #email = EmailMessage('Hello', 'World', to=[ user.email])
-       # email.send()
+        #email.send()
         user_info = Profile.objects.get(user_id=user.id)
         name = user.first_name
         surname = user.last_name
@@ -436,7 +462,8 @@ def profile(request):   #view profile info
             profile = Profile(city = request.POST.get("city"), country = request.POST.get("country"),
                         degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"),
                         user_id = user.id)
-            profile.save()
+            
+            # profile.save() #? 
 
             #send email
             #email = EmailMessage('Hello', 'World', to=[ user.email])
@@ -471,13 +498,12 @@ def profile(request):   #view profile info
             search = SearchForm()
             return render(request, '../templates/alumni/createProfile.html', {'form': prof_form, 'search' : search})
 
-def view_profile(request):
-#view profile info
-  #def create_profile(request):  #create profile
+def view_profile(request): # view profile info
     user = request.user
     prof_form = ProfileForm()
     if request.method == "POST":
         prof_form = ProfileForm(request.POST)
+        # create the profile
         profile = Profile(city = request.POST.get("city"), country = request.POST.get("country"),
                     degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"),
                           user_id = user.id )
@@ -494,6 +520,7 @@ def view_profile(request):
                                                                     'city': city, "country": country, "degree" : degree,\
                                                                     "grad_year": grad_year} )
     else:
+        # view the profile
         prof_form = ProfileForm()
         return render(request, '../templates/alumni/createProfile.html', {'form': prof_form})
 
