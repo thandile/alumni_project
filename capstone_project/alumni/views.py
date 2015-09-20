@@ -179,24 +179,29 @@ def search(request):  #searching function
     print "**************************************************************************************"
     print "searchText is ", searchText
     print request.GET['search_item']
+    for k,v in request.GET.iteritems():
+        print k,v
     print "**************************************************************************************"
     
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET['q']
         if request.GET['search_item'] == "1":
-            # use __in for exact matches and use __contains for "LIKE"
-            matches = User.objects.filter(Q(first_name__contains=searchText) | Q(email__contains=searchText) | Q(last_name__contains=searchText))
+            # use __in for exact matches and use __contains for "LIKE" and __icontains for case-insenstive LIKE
+            matches = User.objects.filter(Q(first_name__icontains=searchText) | Q(email__icontains=searchText) | Q(last_name__icontains=searchText)| Q(first_name__in=searchText) | Q(email__in=searchText) | Q(last_name__in=searchText))
             found = make_paginator(request, matches, 20)
             #found_entries = User.objects.filter(entry_query)
             #found = return_search_items("auth_user", found_entries)
-
         if request.GET['search_item'] == "2" or request.GET['search_item'] == "3" or request.GET['search_item'] == "6":
             '''
             entry_query = get_query(query_string, ['degree', 'grad_year', 'city', 'country'])
             found_entries = Profile.objects.filter(entry_query)
             found =  return_search_items("alumni_profile", found_entries)
             '''
-            matches = Profile.objects.filter(Q(degree__contains=searchText) | Q(grad_year__contains=searchText) | Q(city__contains=searchText) | Q(country__contains=searchText))
+
+            matches = Profile.objects.filter(Q(degree__icontains=searchText) | Q(grad_year__in=searchText) | Q(city__icontains=searchText) | Q(country__icontains=searchText))
+
+            #matches = Profile.objects.filter(Q(degree__icontains=searchText) | Q(city__icontains=searchText) | Q(country__icontains=searchText))
+
             '''
             this is giving problems - I think integers field (grad_year) may need to be checked seperately
             '''
@@ -207,7 +212,7 @@ def search(request):  #searching function
             found = found_entries = Job.objects.filter(entry_query)
             found = return_search_items("alumni_job", found_entries)
             '''
-            matches = Job.objects.filter(Q(company_name__contains=searchText) | Q(job_desc__contains=searchText) | Q(job_title__contains=searchText))
+            matches = Job.objects.filter(Q(company_name__icontains=searchText) | Q(job_desc__icontains=searchText) | Q(job_title__icontains=searchText))
             found = make_paginator(request, matches, 20)
         if request.GET['search_item'] == "5":
             '''
@@ -215,7 +220,7 @@ def search(request):  #searching function
             found_entries = Advert.objects.filter(entry_query)
             found = return_search_items("alumni_advert", found_entries)
             '''
-            matches = Advert.objects.filter(Q(city__contains=searchText) | Q(country__contains=searchText) | Q(title__contains=searchText) | Q(description__contains=searchText) | Q(reference__contains=searchText))
+            matches = Advert.objects.filter(Q(city__icontains=searchText) | Q(country__icontains=searchText) | Q(title__icontains=searchText) | Q(description__icontains=searchText) | Q(reference__icontains=searchText))
             found = make_paginator(request, matches, 20)
     
     return render_to_response('../templates/alumni/search.html',
