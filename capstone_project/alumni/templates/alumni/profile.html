@@ -57,21 +57,35 @@ Released   : 20130903
          <input type="submit" value="Submit"/>
         </form>
 		<div id="content" >
-			<h3>
-			<p>Name: {{ name }} </p>
-			<p>Surname: {{surname }} </p>
-			<p>Email Address: {{ email }} </p>
-			<p>Degree: {{ degree }} </p>
-			<p>Graduation year: {{ grad_year }}</p>
-				<p>City: {{ city }}</p>
-			<p>Country: {{ country }} </p>
+			             <div id="list">
+<table border="0" cellpadding="4" width="150%">
+{% csrf_token %}
+    <tr>
+        <td>First Names:</td><td>{{ name }}</td>
+	</tr>
+	<tr>
+        <td>Last Names:</td><td>{{ surname }}</td>
+    </tr>
+	<tr>
+        <td>Email Address:</td><td>{{ email }}</td>
+    </tr>
+	<tr>
+        <td>Degree:</td><td>{{ degree }}</td>
+    </tr>
+	<tr>
+        <td>Graduation Year:</td><td>{{ grad_year }}</td>
+    </tr>
+	<tr>
+        <td>Location:</td><td> {{ city }}, {{ country }} </td>
+    </tr>
+  </table>
 
-			<p></p>
+</div>
 				<form method="post" action="" align="right" >
 				{% csrf_token %}
-					<input type="submit" name="edit" value="Edit Profile" formaction="/alumni/profile/edit/{{ id }}/"/>
+					<input type="submit" class="button" name="edit" value="Edit Profile" formaction="/alumni/profile/edit/{{ id }}/"/>
 				</form>
-				</h3>
+
 
 		</div>
 	</div>

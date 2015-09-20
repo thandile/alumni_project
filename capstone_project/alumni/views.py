@@ -284,7 +284,6 @@ def create_profile(request):  #create profile
                     degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"),
                     user_id = user.id)
         profile.save()
-
         #send email
         #email = EmailMessage('Hello', 'World', to=[ user.email])
        # email.send()
@@ -298,7 +297,7 @@ def create_profile(request):  #create profile
         grad_year = user_info.grad_year
         search = SearchForm()
         #send_email(user.email, "Test", "Hello world")
-        return render(request, '../templates/alumni/profile.html', {'search': search, 'name' : name, 'surname' : surname, 'email' : email, 'city': city, "country": country, "degree" : degree, "grad_year": grad_year} )
+        return render(request, '../templates/alumni/profile.html', {'id': user_info.id, 'search': search, 'name' : name, 'surname' : surname, 'email' : email, 'city': city, "country": country, "degree" : degree, "grad_year": grad_year} )
     else:
         prof_form = ProfileForm()
         search = SearchForm()
@@ -309,27 +308,52 @@ def profile(request):   #view profile info
         #prof = Profile.objects.get(pk=id)
         user = request.user
         #if Profile.objects.get( user_id =user.id):
-        if request.method == "POST" and request.POST.get("save"):
-            prof_form = ProfileForm(request.POST)
-            profile = Profile(city = request.POST.get("city"), country = request.POST.get("country"),
-                        degree = request.POST.get("degree"), grad_year = request.POST.get("grad_year"),
-                        user_id = user.id)
-            profile.save()
-
-            #send email
-            #email = EmailMessage('Hello', 'World', to=[ user.email])
-           # email.send()
-            user_info = Profile.objects.get(user_id=user.id)
-            name = user.first_name
-            surname = user.last_name
-            email = user.email
-            city = user_info.city
-            country = user_info.country
-            degree = user_info.degree
-            grad_year = user_info.grad_year
-            search = SearchForm()
-            #send_email(user.email, "Test", "Hello world")
-            return render(request, '../templates/alumni/profile.html', {'search': search, 'name' : name, 'surname' : surname, 'email' : email, 'city': city, "country": country, "degree" : degree, "grad_year": grad_year} )
+        if request.method == "POST" and request.POST.get("saveProf"):
+            user = request.user
+            #prof = EditProfileForm(request.POST)
+            city = request.POST['city']
+            country = request.POST['country']
+            degree = request.POST['degree']
+            grad_year = request.POST['grad_year']
+            #user_name = request.POST['first_name']
+            #user_lastname = request.POST['last_name']
+            #user_email = request.POST['email']
+            prof = Profile.objects.get(user_id =user.id)
+            prof.degree = degree
+            prof.grad_year = grad_year
+            prof.city = city
+            prof.country = country
+            #profile = Profile(degree = degree, grad_year = grad_year, city = city, country = country)
+            #user.first_name = user_name
+            #user.last_name = user_lastname
+            #user.email = user_email
+            #user.save()
+            prof.save()
+            return render(request, '../templates/alumni/profile.html', {'id' : prof.id, 'grad_year':grad_year, 'degree':degree, \
+                                                                              'city':city, 'country': country} )
+        elif request.method == "POST" and request.POST.get('saveedit'):
+            user = request.user
+            editprof = EditProfileForm(request.POST)
+            city = request.POST['city']
+            country = request.POST['country']
+            degree = request.POST['degree']
+            grad_year = request.POST['grad_year']
+            user_name = request.POST['first_name']
+            user_lastname = request.POST['last_name']
+            user_email = request.POST['email']
+            prof = Profile.objects.get(user_id =user.id)
+            prof.degree = degree
+            prof.grad_year = grad_year
+            prof.city = city
+            prof.country = country
+            #profile = Profile(degree = degree, grad_year = grad_year, city = city, country = country)
+            user.first_name = user_name
+            user.last_name = user_lastname
+            user.email = user_email
+            user.save()
+            prof.save()
+            return render(request, '../templates/alumni/profile.html', {'id' : prof.id, 'name':user_name, 'surname' : user_lastname,'email':user_email, 'grad_year':grad_year, 'degree':degree, \
+                                                                              'city':city, 'country': country} )
 
         try:
             user_info = Profile.objects.get( user_id =user.id)
@@ -369,12 +393,14 @@ def view_profile(request):
         country = user_info.country
         degree = user_info.degree
         grad_year = user_info.grad_year
-        return render(request, '../templates/alumni/profile.html', {'name' : name, 'surname' : surname, 'email' : email, \
+        search = SearchForm()
+        return render(request, '../templates/alumni/profile.html', {'id': user_info.id, 'search': search, 'name' : name, 'surname' : surname, 'email' : email, \
                                                                     'city': city, "country": country, "degree" : degree,\
                                                                     "grad_year": grad_year} )
     else:
         prof_form = ProfileForm()
-        return render(request, '../templates/alumni/createProfile.html', {'form': prof_form})
+        search = SearchForm()
+        return render(request, '../templates/alumni/createProfile.html', {'search': search, 'form': prof_form})
 
 
 def send_email(recipient, subject, body):
@@ -399,51 +425,19 @@ def send_email(recipient, subject, body):
         print ("failed to send mail")
 
 
-'''def edit_profile(request):
-
-    user = User.objects.get('pk')
-    user_info = Profile.objects.get(user_id=user.id)
-
-    name = user.first_name
-    surname = user.last_name
-    email = user.email
-    city = user_info.city
-    country = user_info.country
-    degree = user_info.degree
-    grad_year = user_info.grad_year
-
-    edit_form = EditProfileForm(request.POST or None, initial={'name' : name, 'surname' : surname, 'email' : email, 'city': city, "country": country, "degree" : degree, "grad_year": grad_year})
-
-    if request.method == "POST":
-
-        if edit_form.is_valid():
-
-            user.name = request.POST['first_name']
-            user.surname = request.POST['surname']
-            user.email = request.POST['email']
-            user_info.city = request.POST['city']
-            user_info.country = request.POST['country']
-            user_info.degree = request.POST['degree']
-            user_info.grad_year = request.POST['grad_year']
-            edit_form.save()
-            return HttpResponseRedirect('%s'%(reverse('profile')))
-    context = {"form" : edit_form}
-
-
-    return render(request, '../templates/alumni/editProfile.html', context)'''
-
 
 def edit_profile(request, id):    #complete editing
 
     if request.method == "POST" and request.POST.get('edit'):
         profile = Profile.objects.get(pk=id)
         user = request.user
-        prof = EditProfileForm(initial={'first_name' : user.first_name, 'last_name' : user.last_name,'email' : user.email, 'city': profile.city, "country": profile.country, "degree" : profile.degree, \
-                                        "grad_year": profile.grad_year})
+        prof = EditProfileForm(initial={'first_name' : user.first_name, 'last_name' : user.last_name,\
+                                        'email' : user.email, 'city': profile.city, "country": profile.country,\
+                                        "degree" : profile.degree, "grad_year": profile.grad_year})
         return render(request, '../templates/alumni/editProfile.html', {'form' : prof})
-    elif request.method == "POST" and request.POST.get('save'):
+    elif request.method == "POST" and request.POST.get('saveedit'):
         user = request.user
-        prof = EditProfileForm(request.POST)
+        editprof = EditProfileForm(request.POST)
         city = request.POST['city']
         country = request.POST['country']
         degree = request.POST['degree']
@@ -521,29 +515,34 @@ def create_events(request):  #create events
         event = Event(creating_user = user, title = title, event_type = event_type, description = description, \
                       year = year, month = month, day = day, street = street, city = city, country = country)
         event.save()
-        return render(request, '../templates/alumni/display_event.html', { 'id' : event.id, 'title':title, 'event_type':event_type, \
+        search = SearchForm()
+        return render(request, '../templates/alumni/display_event.html', { 'search': search, 'id' : event.id, 'title':title, 'event_type':event_type, \
                                                                           'description':description, 'year': year, \
                                                                         'month':month, 'day':day, 'street':street,\
                                                                           'city':city, 'country':country})
     else:
         events = EventsForm()
-        return render(request, '../templates/alumni/create_event.html', {'form':events})
+        search = SearchForm()
+        return render(request, '../templates/alumni/create_event.html', {'search': search, 'form':events})
 
 
 def events(request):  #display events
+    search = SearchForm()
     if request.method == "POST" and request.POST.get('delete'):
         obj = Event.objects.get(pk=id)
         #if request.user == obj.creating_user:  delete only if creating user
         obj.delete()
         event = Event.objects.all()
         #return HttpResponse("Event deleted")
-        return render(request, '../templates/alumni/events.html', {'events': event})
+
+        return render(request, '../templates/alumni/events.html', { 'search': search, 'events': event})
     else:
         event = Event.objects.all()
-        return render(request, '../templates/alumni/events.html', {'events':event})
+        return render(request, '../templates/alumni/events.html', {'search': search, 'events':event})
 
 
 def events_view(request, id):   #view selected event
+    search = SearchForm()
     event = Event.objects.get(pk=id)
     title = event.title
     event_type = event.event_type
@@ -554,32 +553,33 @@ def events_view(request, id):   #view selected event
     street = event.street
     city = event.street
     country = event.country
-    return render(request, '../templates/alumni/display_event.html', {'id' : event.id, 'title':title, 'event_type':event_type, \
-                                                                      'description':description, 'year': year, \
-                                                                      'month':month, 'day':day, 'street':street, \
-                                                                      'city':city, 'country':country})
+    return render(request, '../templates/alumni/display_event.html', {'search' : search, 'id' : event.id, 'title':title,\
+                                                                      'event_type':event_type,  'description':description,\
+                                                                      'year': year,'month':month, 'day':day,\
+                                                                      'street':street, 'city':city, 'country':country})
 
 
 def events_delete(request, id):
+    search = SearchForm()
     if request.method == "POST" and request.POST.get('delete'):
         obj = Event.objects.get(pk=id)
         obj.delete()
         event = Event.objects.all()
         #return HttpResponse("Event deleted")
-        return render(request, '../templates/alumni/events.html', {'events': event})
+        return render(request, '../templates/alumni/events.html', {'search': search, 'events': event})
     else:
         event = Event.objects.all()
-        return render(request, '../templates/alumni/events.html', {'events':event})
+        return render(request, '../templates/alumni/events.html', {'search': search, 'events':event})
 
 
 def events_edit(request, id):    #complete editing
-
+    search = SearchForm()
     if request.method == "POST" and request.POST.get('edit'):
-
         event = Event.objects.get(pk=id)
-        event = EventsForm(initial={'title' : event.title, 'event type' : event.event_type, 'description' : event.description, \
-                                     'year' : event.year, 'month' : event.month, 'day' : event.day, \
-                                    'street' : event.street, 'city' : event.city, 'country' : event.country})
+        event = EventsForm(initial={'search': search, 'title' : event.title, 'event type' : event.event_type,\
+                                    'description' : event.description,  'year' : event.year, 'month' : event.month, \
+                                    'day' : event.day, 'street' : event.street, 'city' : event.city, \
+                                    'country' : event.country})
         return render(request, '../templates/alumni/edit_event.html', {'form' : event})
     elif request.method == "POST" and request.POST.get('save'):
         user = request.user
@@ -598,7 +598,7 @@ def events_edit(request, id):    #complete editing
         event = Event(creating_user = user, title = title, event_type = event_type, description = description, \
                       year = year, month = month, day = day, street = street, city = city, country = country)
         event.save()
-        return render(request, '../templates/alumni/display_event.html', { 'id' : event.id, 'title':title, 'event_type':event_type, \
-                                                                          'description':description, 'year': year, \
-                                                                        'month':month, 'day':day, 'street':street,\
-                                                                          'city':city, 'country':country})
+        return render(request, '../templates/alumni/display_event.html', {'search': search, 'id' : event.id, 'title':title,\
+                                                                          'event_type':event_type, 'description':description, \
+                                                                          'year': year, 'month':month, 'day':day, \
+                                                                          'street':street,'city':city, 'country':country})
