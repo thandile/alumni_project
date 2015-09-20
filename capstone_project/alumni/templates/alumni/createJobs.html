@@ -44,10 +44,9 @@ Released   : 20130903
 		</div>
 	</div>
 </div>
-
 <div id="wrapper">
 	<div id="page" class="container">
-	<form method="get" action="/alumni/search/" align="right">
+        <form method="get" action="/alumni/search/" align="right">
 		<label for="id_q"></label>
 		{% csrf_token %}
 		{{ search }}
@@ -55,17 +54,13 @@ Released   : 20130903
          <input type="submit" value="Submit"/>
         </form>
 		<div id="content">
-            <h2>Edit Profile</h2>
-
-
 			<h3>
+				<p>Create your job history</p></h3>
 			<form method="post" action="" enctype="multipart/form-data">
 				{% csrf_token %}
 				{{ form.as_p}}
-				<input type="submit" class="button" name="saveedit" value="Save Changes" formaction="/alumni/userprofile/" />
+				<input type="submit" class="button" name="saveJob"  value="Save job" />
 			</form>
-
-			</h3>
 
 		</div>
 	</div>

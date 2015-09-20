@@ -46,6 +46,13 @@ Released   : 20130903
 </div>
 <div id="wrapper">
 	<div id="page" class="container">
+		<form method="get" action="/alumni/search/" align="right">
+		<label for="id_q"></label>
+		{% csrf_token %}
+		{{ search }}
+		<input type="text" name="q" id="id_q"/>
+         <input type="submit" value="Submit"/>
+        </form>
 		<div id="content">
 			<h3>
 				<p>Create your user profile</p>

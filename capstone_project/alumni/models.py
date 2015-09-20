@@ -40,20 +40,20 @@ class Profile(models.Model):
 
 # instead of company on the profile itself, job object linked to a profle
 class Job(models.Model): # job in the 'piece of work history' sense, not a job advert
-
+    job_profile = models.IntegerField(blank=False, null=False)
     company_name = models.CharField(max_length=255, blank=True, null=True)
-    job_desc = models.CharField(max_length=255, blank=True, null=True)
     job_title = models.CharField(max_length=255, blank=True, null=True) #the reference for the company advertising?
-    
-    # thinking that we can grab jobs in their order of dates on the profile. 
-    start_date = models.DateTimeField() #blank=True, null=True <- allow nulls?
-    end_date = models.DateTimeField()
-    
+    job_desc = models.CharField(max_length=255, blank=True, null=True)
+    job_location = models.CharField(max_length=255, blank=True, null=True)
+    # thinking that we can grab jobs in their order of dates on the profile.
+    start_date = models.DateTimeField(blank=True, null=True)# <- allow nulls?
+    end_date = models.DateTimeField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
-    
+    job_number = models.CharField( max_length=10, blank=True, null=True)
+
     def __unicode__(self):
-        return str(self.company_name) + ', '+ str(self.job_desc) + ', ' +str(self.job_title)
+        return str(self.company_name) + ', '+ str(self.job_desc) + ', ' +str(self.job_title)+ ', ' +str(self.job_user)
 
 class Advert(models.Model): # "Jobs"
     creating_user = models.ForeignKey(User, related_name='advert_user')
