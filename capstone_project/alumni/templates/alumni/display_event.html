@@ -49,24 +49,37 @@ Released   : 20130903
 	<div id="page" class="container">
 		<div id="content">
 			<p><a href="/alumni/events/" >Back to Events </a></p>
-			<h3>
+
 
                 
-                <p>Title: {{ title }}</p>
-                <p>Event Type: {{ event_type }}</p>
-                <p>Description: {{ description }}</p>
-                <p>Date: {{ year }}-{{ month }}-{{ day }} </p>
-                <p>Street: {{ street }}</p>
-                <p>City: {{ city }}</p>
-                <p>Country: {{ country }}</p>
+             <div id="list">
+<table border="0" cellpadding="4" width="100%">
+{% csrf_token %}
+    <tr>
+        <td>Event Title:</td><td>{{ title }}</td>
+	</tr>
+	<tr>
+        <td>Event Type:</td><td>{{ event_type }}</td>
+    </tr>
+	<tr>
+        <td>Event Description:</td><td>{{ description }}</td>
+    </tr>
+	<tr>
+        <td>Date:</td><td>{{ year }}-{{ month }}-{{ day }} </td>
+    </tr>
+	<tr>
+        <td>Address:</td><td>{{ street }}, {{ city }}, {{ country }} </td>
+    </tr>
+  </table>
 
+</div>
 
 				<form method="post" action="" align="right" >
 				{% csrf_token %}
-                <input type="submit" name="delete" value="Delete Event" formaction="/alumni/events/delete/{{ id }}/"/>
-					<input type="submit" name="edit" value="Edit Event" formaction="/alumni/events/edit/{{ id }}/"/>
+                <input type="submit" class="button" name="delete" value="Delete Event" formaction="/alumni/events/delete/{{ id }}/"/>
+					<input type="submit" class="button" name="edit" value="Edit Event" formaction="/alumni/events/edit/{{ id }}/"/>
 				</form>
-             </h3>
+
 
 		</div>
 	</div>

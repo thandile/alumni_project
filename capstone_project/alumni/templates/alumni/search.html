@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+You searched for "{{ query_string }}" and the results are listed below.
+
+    {% csrf_token %}
+    {% for event in found_entries %}
+    <ul>
+           <li> {{ event }}</li>
+    </ul>
+            {% endfor %}
+</body>
+</html>
