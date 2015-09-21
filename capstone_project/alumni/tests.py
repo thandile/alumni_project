@@ -3,8 +3,10 @@ from django.test import TestCase #  subclass of unittest.TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-
 from alumni import models
+from alumni import views
+
+
 # Create your tests here.
 
 # NB - Note that the Django test framework creates a separate, blank set of database tables for testing (i.e. "runs each test inside a transaction to provide isolation" in the 1.8 docs)
@@ -29,6 +31,27 @@ class ForumTestCase(TestCase):
         self.assertEqual(testcase_thread_one.get_num_posts(),1)
         self.assertEqual(testcase_thread_one.get_num_posts(),2)
 
-        
+
+class EmailFunctionalityTestCase(TestCase):
+    # test email functionality where one user wants to suggest changes to the other user's profile
+    def make_test_form():
+        data = {'degree': 'political science','grad_year': '1971','city': 'chigaco','country': 'Mighty Ulm'}
+        data2 = {'degree': 'actual science','grad_year': '1971','city': 'chigaco','country': 'Mighty Ulm'}
+        f = views.ProfileForm(data, initial=data2)
+    	return f
+
+	def set_up(self):
+        testcase_profile_update_form = make_test_form()
+        # testcase_user = User.create(name = "SCMHUCK") # need an actual user to recieve the email here!
+        testcase_user = User.objects.filter(pk = 1)
+
+	def test_changes_alert(self):
+	    if testcase_profile_update_form.has_changed():
+	        message = ""
+	        message = str("TEST") + " " + str("TEST") + " has suggested the following changes to your profile: " + '\n\r'
+	        for field in testcase_profile_update_form.changed_data:
+	            message += str(field) + str(testcase_profile_update_form[field]) + '\n\r'
+
+	        views.spam_those_poor_suckers("Suggested edits to your Profile!", message, from_email = None, suckers =  testcase_user)
 
 

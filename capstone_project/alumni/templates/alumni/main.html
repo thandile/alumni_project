@@ -36,7 +36,7 @@ Released   : 20130903
 			<ul>
 				<li class="icon icon-ok current_page_item"><a href="/alumni/home/" accesskey="1" title="">Homepage</a></li>
 				<li class="icon icon-ok"><a href="/alumni/userprofile/" accesskey="2" title="">Your Profile</a></li>
-				<li class="icon icon-ok"><a href="#" accesskey="3" title="">Events</a></li>
+				<li class="icon icon-ok"><a href="/alumni/events/" accesskey="3" title="">Events</a></li>
 				<li class="icon icon-ok"><a href="/alumni/careers/" accesskey="4" title="">Careers</a></li>
 				<li class="icon icon-ok"><a href="/alumni/main/" accesskey="5" title="">Forums</a></li>
 				<li class="icon icon-ok"><a href="/alumni/login/" accesskey="5" title="">Log Out</a></li>
@@ -56,7 +56,7 @@ Released   : 20130903
 <div id="list"><h3>
 <table border="0" cellpadding="4" width="100%">
     <tr>
-        <td></td>
+        <td>Forum</td>
         <td>Posts</td>
         <td>Last post</td>
         <td></td>
@@ -68,10 +68,10 @@ Released   : 20130903
         <div class="title"> <a href="{{forum.get_absolute_url}}"> {{ forum.title }}</a>
         </div></td>
         <td {% if forloop.last %}class="last"{% endif %}>{{ forum.get_num_posts }}</td>
+        <!--<td {% if forloop.last %}class="last"{% endif %}>{{ forum.get_latest_post.short|linebreaksbr }}</td>-->
+        <td {% if forloop.last %}class="last"{% endif %}>{{ forum.get_latest_post }}</td>
         <td {% if forloop.last %}class="last"{% endif %}>
-            {{ forum.get_latest_post.short|linebreaksbr }}</td>
-        <td {% if forloop.last %}class="last"{% endif %}>
-            <a class="button" href="{{forum.get_absolute_url}}">View Thread</a>
+            <a class="button" href="{{forum.get_absolute_url}}">View Forum</a>
         </td>
     </tr>
 

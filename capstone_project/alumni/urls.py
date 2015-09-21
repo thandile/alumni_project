@@ -23,13 +23,14 @@ urlpatterns = [
     # web page is generated based on code in views.py -> Note: path will be /alumni/create/ **NOT** /create/
     url(r'^forum/(?P<forum_pk>[0-9]+)/$', views.forum, name='forum'),
     url(r'^thread/(?P<thread_pk>[0-9]+)/$', views.thread, name='thread'),
-    url(r'^new_thread/(?P<forum_pk>[0-9]+)/$', views.create_new_thread, name="new_thread"),
+    url(r'^newthread/(?P<forum_pk>[0-9]+)/$', views.create_new_thread, name="create_new_thread"),
+    #url(r'^newthread/$', views.create_new_thread, name="new_thread"),
     url(r'^post/(?P<thread_pk>[0-9]+)/$', views.post, name="new_post"), # idea here is for creating a new post, NOT a listing of posts like the above
     url(r'^profile/$', views.create_profile, name='create_profile'),
     url(r'^login/$', views.log_in, name='login'),
     #url(r'^user_profile/$', views.profile, name='user_profile'),
     #url(r'^logout/$', views.logout_view, name='logout'),
-    url(r'^userprofile/$', views.profile, name='user_profile'),
+    url(r'^userprofile/$', views.profile__view, name='user_profile'),
     url(r'^home/$', views.home, name='home'),
     #url(r'^edit_profile/$', views.view_profile, name='view_profile'),
 	

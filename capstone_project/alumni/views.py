@@ -1,20 +1,23 @@
-from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
-from django.core.mail import EmailMessage
-from django.core.mail import send_mail, send_mass_mail
+from django.core.mail import EmailMessage, send_mail, send_mass_mail
 from django.db import connection
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import *
 import datetime,calendar
-from datetime import  date
-from django.contrib.auth.models import User
+from datetime import date
 from django.template import RequestContext
-from alumni.models import *
+'''
+# from django.contrib.auth.models import User <- not needed, imported with 'from alumni import models'
+
+# from alumni.models import *
+#from alumni.models import Event # ? => "modele object has no attribute Event" ??
+'''
+from alumni.models import User, Profile
 from alumni import models
 from django import forms
 from django.core.paginator import Paginator
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from django.core.context_processors import csrf
 import re
 from django.db.models import Q
@@ -43,9 +46,9 @@ class EditProfileForm(forms.Form):
 
 
 class SearchForm(forms.Form):
-    search_item = forms.ChoiceField(choices = [('-',''),('1','User'),('2','Graduation Year'),('3','Degree'),\
-                                               ('4', 'Company'), ('5', 'Job'),('6','Physical Location')], label="Search")
-
+    # 1: user 2: Year 3: Degree 4:Company 5:Job 6:Loc
+    search_item = forms.ChoiceField(choices = [('-',''),('USER','User'),('YEAR','Graduation Year'),('DEGREE','Degree'),\
+                                               ('COMPANY', 'Company'), ('JOB', 'Job'),('LOC','Physical Location')], label="Search")
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -102,7 +105,6 @@ class EditEventsForm(forms.Form):
     city = forms.CharField(max_length=50)
     country = forms.CharField(max_length=50)
 
-
 '''def create(request):    #creating new user
     form = UserForm()
     if request.method == "POST":
@@ -125,14 +127,11 @@ class EditEventsForm(forms.Form):
             return render(request, "../templates/alumni/toProfile.html", {'userid' : new_user.id, 'username' : \
                 new_user.first_name})
         #send email
-
     else:
         # they are requesting the page, give
         form = UserForm()
         return render(request, '../templates/alumni/create.html', {'form': form})
-
 '''
-
 
 def normalize_query(query_string,
                     findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
@@ -168,13 +167,11 @@ def get_query(query_string, search_fields):
             query = query & or_query
     return query
 
-
 def search(request):  #searching function
     query_string = ''
     found_entries = None
     found = None
-    
-    searchText = normalize_query(request.GET['q'])
+    searchText = normalize_query(request.GET['q'])[0]
     
     print "**************************************************************************************"
     print "searchText is ", searchText
@@ -185,42 +182,29 @@ def search(request):  #searching function
     
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET['q']
-        if request.GET['search_item'] == "1":
+        #if request.GET['search_item'] == "USER":
+        if request.GET['search_item'] == '1':
             # use __in for exact matches and use __contains for "LIKE" and __icontains for case-insenstive LIKE
-            matches = User.objects.filter(Q(first_name__icontains=searchText) | Q(email__icontains=searchText) | Q(last_name__icontains=searchText)| Q(first_name__in=searchText) | Q(email__in=searchText) | Q(last_name__in=searchText))
+            # use a LIST for __in , give a string / int / ... for __icontains !
+            matches = User.objects.filter(Q(first_name__icontains=searchText) | Q(email__icontains=searchText) | Q(last_name__icontains=searchText)| Q(first_name__in=[searchText]) | Q(email__in=[searchText]) | Q(last_name__in=[searchText]))
             found = make_paginator(request, matches, 20)
             #found_entries = User.objects.filter(entry_query)
             #found = return_search_items("auth_user", found_entries)
-        if request.GET['search_item'] == "2" or request.GET['search_item'] == "3" or request.GET['search_item'] == "6":
-            '''
-            entry_query = get_query(query_string, ['degree', 'grad_year', 'city', 'country'])
-            found_entries = Profile.objects.filter(entry_query)
-            found =  return_search_items("alumni_profile", found_entries)
-            '''
-
-            matches = Profile.objects.filter(Q(degree__icontains=searchText) | Q(grad_year__in=searchText) | Q(city__icontains=searchText) | Q(country__icontains=searchText))
-
-            #matches = Profile.objects.filter(Q(degree__icontains=searchText) | Q(city__icontains=searchText) | Q(country__icontains=searchText))
-
-            '''
-            this is giving problems - I think integers field (grad_year) may need to be checked seperately
-            '''
+        #if request.GET['search_item'] == "YEAR":
+        if request.GET['search_item'] == '2':
+            matches = models.Profile.objects.filter(grad_year__in=[searchText])
             found = make_paginator(request, matches, 20)
-        if request.GET['search_item'] == "4":
-            '''
-            entry_query = get_query(query_string, ['company_name', 'job_desc', 'job_title'])
-            found = found_entries = Job.objects.filter(entry_query)
-            found = return_search_items("alumni_job", found_entries)
-            '''
-            matches = Job.objects.filter(Q(company_name__icontains=searchText) | Q(job_desc__icontains=searchText) | Q(job_title__icontains=searchText))
+        #if request.GET['search_item'] == "DEGREE" or request.GET['search_item'] == "LOC":
+        if request.GET['search_item'] == '3' or request.GET['search_item'] == '6':
+            matches = models.Profile.objects.filter(Q(degree__icontains=searchText) | Q(city__icontains=searchText) | Q(country__icontains=searchText))
             found = make_paginator(request, matches, 20)
-        if request.GET['search_item'] == "5":
-            '''
-            entry_query = get_query(query_string, ['city', 'country', 'title', 'description', 'reference'])
-            found_entries = Advert.objects.filter(entry_query)
-            found = return_search_items("alumni_advert", found_entries)
-            '''
-            matches = Advert.objects.filter(Q(city__icontains=searchText) | Q(country__icontains=searchText) | Q(title__icontains=searchText) | Q(description__icontains=searchText) | Q(reference__icontains=searchText))
+        #if request.GET['search_item'] == "COMPANY":
+        if request.GET['search_item'] == '4': # note this is a company from Job object - i.e. a piece of someone's work history not a 'jobadvert'
+            matches = models.Job.objects.filter(Q(company_name__icontains=searchText) | Q(job_desc__icontains=searchText) | Q(job_title__icontains=searchText))
+            found = make_paginator(request, matches, 20)
+        #if request.GET['search_item'] == "JOB":
+        if request.GET['search_item'] == '5':
+            matches = models.Advert.objects.filter(Q(city__icontains=searchText) | Q(country__icontains=searchText) | Q(title__icontains=searchText) | Q(description__icontains=searchText) | Q(reference__icontains=searchText))
             found = make_paginator(request, matches, 20)
     
     return render_to_response('../templates/alumni/search.html',
@@ -257,14 +241,14 @@ def main(request):
 
 def add_csrf(request, **kwargs):
     d = dict(user=request.user, ** kwargs)
-    d.update(csrf(request))
+    d.update(csrf(request)) 
     return d
 
 def advert(request): # (i.e. post a single advert)
     if request.method == "POST":
         form = AdvertForm(request.POST)
         if form.is_valid():
-            advert = Advert(**form.cleaned_data)
+            advert = models.Advert(**form.cleaned_data)
             advert.creating_user = request.user
             # redirect them back to careers listing
             # return render_to_response("../templates/alumni/careers.html", add_csrf(request, adverts=adverts))
@@ -298,14 +282,14 @@ def make_paginator(request, items, num_items):
 # regular joe users should be allowed to create threads and posts within the exsisting forums (of course)
 def forum(request, forum_pk):
     # listing of threads in a particular forum
-    threads = models.Thread.objects.filter(forum=forum_pk).order_by("-created_date")
+    threads = models.Thread.objects.filter(forum=forum_pk).order_by("-created_date") # most recent threads first!
     threads = make_paginator(request, threads, 20)
     #return render(request, "../templates/alumni/forum.html", add_csrf(request, threads=threads, pk=forum_pk))
     return render_to_response("../templates/alumni/forum.html", add_csrf(request, threads=threads, pk=forum_pk))
 
 def thread(request, thread_pk):
     # listing of threads in a particular forum
-    posts = models.Post.objects.filter(thread=thread_pk).order_by("created_date")
+    posts = models.Post.objects.filter(thread=thread_pk).order_by("created_date") # oldest posts first within a thread!
     posts = make_paginator(request, posts, 20)
     #return render(response, "../templates/alumni/thread.html", add_csrf(request, posts=posts, pk=thread_pk))
     return render_to_response("../templates/alumni/thread.html", add_csrf(request, posts=posts, pk=thread_pk))
@@ -351,12 +335,17 @@ def create_new_thread(request, forum_pk):
             post.creating_user = request.user
             post.save()
             # go into the newly made thread
-            return thread(request, thread.pk)
+            # return thread(request, thread.pk)
+            posts = models.Post.objects.filter(thread=thread_pk).order_by("created_date")
+            posts = make_paginator(request, posts, 20)
+            #return render(response, "../templates/alumni/thread.html", add_csrf(request, posts=posts, pk=thread_pk))
+            return render_to_response("../templates/alumni/thread.html", add_csrf(request, posts=posts, pk=thread_pk))
     else:
         thread_form = ThreadForm()
         post_form = PostForm()
-    # url_path = '../templates/alumni/newthread'+ forum.pk +'.html'
+    #url_path = '../templates/alumni/newthread'+ forum.pk +'.html'
     return render(request, '../templates/alumni/newthread.html', {'thread_form': thread_form, 'post_form': post_form})
+    #return HttpResponse("Hello, world. You're at the alumni index.")
     # return render(request, url_path, {'thread_form': thread_form, 'post_form': post_form})
 
 # Django's CreateView, ListView, UpdateView and DeleteView should be used for posting new threads, comments, etc...
@@ -390,7 +379,7 @@ def spam_those_poor_suckers(subject, message, from_email = None, suckers = None)
 def send_proxy_info(request, editee_id):
     # editee - i.e. receiver of the edits
     editee = User.objects.get(pk=editee_id)
-    editee_profile = Profile.objects.get(user_id=editee_id)
+    editee_profile = models.Profile.objects.get(user_id=editee_id)
     name = editee.first_name
     surname = editee.last_name
     email = editee.email
@@ -458,7 +447,7 @@ def create_profile(request):  #create profile
         return render(request, '../templates/alumni/createProfile.html', {'form': prof_form, 'search' : search})
 
 
-def profile(request):   #view profile info
+def profile__view(request):   #view profile info
         #prof = Profile.objects.get(pk=id)
         user = request.user
         #if Profile.objects.get( user_id =user.id):
@@ -602,9 +591,8 @@ def log_in(request):
             cursor.execute('SELECT COUNT(*) FROM auth_user')
             num = cursor.fetchall()
             username = num[0][0] +1
-            new_user = User.objects.create_user(username=username, first_name =request.POST['first_name'], \
-                        last_name = request.POST['last_name'], password= request.POST['password'],email= request.POST['email'])
-            #new_user = User.objects.create_user(**form.cleaned_data)
+            #new_user = x
+            new_user = User.objects.create_user(**form.cleaned_data)
             username = username
             password = request.POST['password']
             user = authenticate(username=username, password=password)
@@ -629,8 +617,8 @@ def newsfeed(request, num_items=None):
 '''
 def home(request):
     num_items = 3
-    new_events = Event.objects.all().order_by('-created_date')[:num_items]
-    new_adverts = Advert.objects.all().order_by('-created_date')[:num_items]
+    new_events = models.Event.objects.all().order_by('-created_date')[:num_items]
+    new_adverts = models.Advert.objects.all().order_by('-created_date')[:num_items]
     # posts = models.Posts.objects.all().order_by('created_date')[:num_items]
     new_events = make_paginator(request, new_events, 20)
     new_adverts = make_paginator(request, new_adverts, 20)
@@ -652,7 +640,7 @@ def create_events(request):  #create events
         street = request.POST['street']
         city = request.POST['city']
         country = request.POST['country']
-        event = Event(creating_user = user, title = title, event_type = event_type, description = description, \
+        event = models.Event(creating_user = user, title = title, event_type = event_type, description = description, \
                       year = year, month = month, day = day, street = street, city = city, country = country)
         event.save()
         return render(request, '../templates/alumni/display_event.html', { 'id' : event.id, 'title':title, 'event_type':event_type, \
@@ -666,19 +654,19 @@ def create_events(request):  #create events
 
 def events(request):  #display events
     if request.method == "POST" and request.POST.get('delete'):
-        obj = Event.objects.get(pk=id)
+        obj = models.Event.objects.get(pk=id)
         #if request.user == obj.creating_user:  delete only if creating user
         obj.delete()
-        event = Event.objects.all()
+        event = models.Event.objects.all()
         #return HttpResponse("Event deleted")
         return render(request, '../templates/alumni/events.html', {'events': event})
     else:
-        event = Event.objects.all()
+        event = models.Event.objects.all()
         return render(request, '../templates/alumni/events.html', {'events':event})
 
 
 def events_view(request, id):   #view selected event
-    event = Event.objects.get(pk=id)
+    event = models.Event.objects.get(pk=id)
     title = event.title
     event_type = event.event_type
     description = event.description
@@ -695,9 +683,9 @@ def events_view(request, id):   #view selected event
 
 def events_delete(request, id):
     if request.method == "POST" and request.POST.get('delete'):
-        obj = Event.objects.get(pk=id)
+        obj = models.Event.objects.get(pk=id)
         obj.delete()
-        event = Event.objects.all()
+        event = models.Event.objects.all()
         #return HttpResponse("Event deleted")
         return render(request, '../templates/alumni/events.html', {'events': event})
     else:
@@ -706,10 +694,8 @@ def events_delete(request, id):
 
 
 def events_edit(request, id):    #complete editing
-
     if request.method == "POST" and request.POST.get('edit'):
-
-        event = Event.objects.get(pk=id)
+        event = models.Event.objects.get(pk=id)
         event = EventsForm(initial={'title' : event.title, 'event type' : event.event_type, 'description' : event.description, \
                                      'year' : event.year, 'month' : event.month, 'day' : event.day, \
                                     'street' : event.street, 'city' : event.city, 'country' : event.country})
@@ -728,7 +714,7 @@ def events_edit(request, id):    #complete editing
         country = request.POST['country']
         event_del = Event.objects.get(pk=id)
         event_del.delete()
-        event = Event(creating_user = user, title = title, event_type = event_type, description = description, \
+        event = models.Event(creating_user = user, title = title, event_type = event_type, description = description, \
                       year = year, month = month, day = day, street = street, city = city, country = country)
         event.save()
         return render(request, '../templates/alumni/display_event.html', { 'id' : event.id, 'title':title, 'event_type':event_type, \

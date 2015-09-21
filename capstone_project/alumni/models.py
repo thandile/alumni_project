@@ -5,33 +5,23 @@ from decimal import Decimal
 
 # GRSJAR001, Jarryd Garisch, 16/09/2015
 
-'''
-# https://docs.djangoproject.com/en/1.8/topics/auth/default/
+'''# 'User' object - see: https://docs.djangoproject.com/en/1.8/topics/auth/default/
 # The primary attributes of the default user are:
     username
     password
     email
     first_name
     last_name
-in django there is just 'User', to create a superuser change permissions on this object instead of using a child of user
-'''
-
-'''TODO
-jg - complete forum, job advertisements
-report... implementation, 'program validation and verification'
-'''
-
-
-
-'''
-Solid, up-to-date, reference: http://riceball.com/d/content/django-18-minimal-application-using-generic-class-based-views
-'''
+in django there is just 'User', to create a superuser change permissions on this object instead of using a child of user'''
+''' Solid, up-to-date, reference: http://riceball.com/d/content/django-18-minimal-application-using-generic-class-based-views '''
 
 class Profile(models.Model):
     user = models.ForeignKey(User, related_name='user_obj')
     city = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
     grad_year = models.IntegerField(blank=True, null=True)
+    # display graduates by highest degree => we could create degree objects like 'job' objects that can be attached to the Profile.
+    # it would have faculty, degree_name, level (i.e bachelors / masters / doctorate / ...), university at least.
     degree = models.CharField(max_length=255, blank=True, null=True)
     #company = models.CharField(max_length=255, blank=True, null=True)
     #grad_year as DeciminalField(maxDigits = 4)?
@@ -49,7 +39,7 @@ class Profile(models.Model):
 
 # instead of company on the profile itself, job object linked to a profle
 class Job(models.Model): # job in the 'piece of work history' sense, not a job advert
-
+    #job_prof = models.ForeignKey(models.Profile, related_name='job_prof', default = models.Profile.objects.all()[0])
     company_name = models.CharField(max_length=255, blank=True, null=True)
     job_desc = models.CharField(max_length=255, blank=True, null=True)
     job_title = models.CharField(max_length=255, blank=True, null=True) #the reference for the company advertising?
@@ -64,7 +54,7 @@ class Job(models.Model): # job in the 'piece of work history' sense, not a job a
     def __unicode__(self):
         return str(self.company_name) + ', '+ str(self.job_desc) + ', ' +str(self.job_title)
 
-class Advert(models.Model): # "Jobs" # allow for anyone to post a job advert for now?
+class Advert(models.Model): # "Jobs"
     creating_user = models.ForeignKey(User, related_name='advert_user')
     contact_details = models.EmailField(max_length=255) # need this since the person to contact about the advert might *NOT* be the user creating the advert
     city = models.CharField(max_length=255, blank=True, null=True) # why 255? -> mySQL limit
@@ -127,7 +117,18 @@ class Forum(models.Model):
 
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
+
+    def get_all_posts(self):
+        return [t for t in self.thread_set.all()]
     
+    def get_latest_post(self):
+        latest_post_per_thread = []
+        for thread in self.thread_set.all():
+            latest_post_per_thread.append(thread.post_set.order_by("-created_date")[0])
+        if len(latest_post_per_thread) == 0:
+            return "No Posts in this Forum"
+        else:
+            return latest_post_per_thread[0].title + ": "+ latest_post_per_thread[0].text
     # forum functions 
     def get_num_posts(self):
         # count the number of posts in each Thread, then sum all of them up
@@ -168,12 +169,14 @@ class Thread(models.Model):
         return reverse('alumni.views.thread', kwargs={'thread_pk':self.pk})
 
     def get_absolute_newthread_url(self):
-        return reverse('alumni.views.create_new_thread', kwargs={'thread_pk':self.forum.pk})
+        return reverse('alumni.views.create_new_thread', kwargs={'forum_pk':self.forum.pk})
 
+    '''
     def alt_newthread_url(self):
         key = self.forum.pk
         urlpath = r"/alumni/new_thread/" + string(key) + r"/"
         return urlpath
+    '''
 
     def __unicode__(self):
         return self.title
