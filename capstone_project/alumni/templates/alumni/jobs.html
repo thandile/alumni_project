@@ -58,40 +58,32 @@ Released   : 20130903
         </form>
 		<div id="content" >
 			             <div id="list">
-							 <h3>Job History</h3>
+							 <div class="title"><h1>Job History</h1></div>
 
-<table border="0" cellpadding="4" width="100%">
+<table border="0" cellpadding="4" width="150%">
     <tr>
 
         <td>Company Name</td>
         <td>Job Title</td>
-		<td>Job Description</td>
-		<td>Location</td>
-		<td>Start date</td>
-		<td>End date</td>
     </tr>
 
     {% for job in jobs %}
     {% csrf_token %}
 
     <tr>
-        <td {% if forloop.last %}class="last"{% endif %}>]{{ job.company_name }}</td>
+        <td {% if forloop.last %}class="last"{% endif %}>
+        <a href="/alumni/job/{{ job.id }}/">{{ job.company_name }}</a></td>
         <td {% if forloop.last %}class="last"{% endif %}>{{ job.job_title}}</td>
-		<td {% if forloop.last %}class="last"{% endif %}>{{ job.job_desc}}</td>
-		<td {% if forloop.last %}class="last"{% endif %}>{{ job.job_location}}</td>
-		<td {% if forloop.last %}class="last"{% endif %}>{{ job.start_date}}</td>
-		<td {% if forloop.last %}class="last"{% endif %}>{{ job.end_date }}</td>
+
 		<td></td>
     </tr>
 
     {% endfor %}</table>
-</div>
-
-
-				<p><div><form method="post" action=""  >
+		<p><form method="post" action="" align="center"  >
 				{% csrf_token %}
-					<input type="submit" class="button"  value="Edit Jobs " formaction="/alumni/create_job_history/"/>
-				</form></div></p>
+                <input type="submit" class="button" name="add" value="Add Job" formaction="/alumni/create_job_history/"/>
+				</form></p>
+</div>
 
 	</div>
 </div>

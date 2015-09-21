@@ -47,51 +47,54 @@ Released   : 20130903
 
 <div id="wrapper">
 	<div id="page" class="container">
-
-
-	<form method="get" action="/alumni/search/" align="right">
+			<form method="get" action="/alumni/search/" align="right">
 		<label for="id_q"></label>
 		{% csrf_token %}
 		{{ search }}
 		<input type="text" name="q" id="id_q"/>
          <input type="submit" value="Submit"/>
         </form>
-		<div id="content" >
-			             <div id="list">
-							 <h3>Job History</h3>
-							 <table border="0" cellpadding="4" width="150%">
-		{% csrf_token %}
-			<tr>
-				<td>Company Name:</td><td>{{ name }}</td>
-			</tr>
-			<tr>
-				<td>Job Title:</td><td>{{ surname }}</td>
-			</tr>
-			<tr>
-				<td>Job Description:</td><td>{{ email }}</td>
-			</tr>
-			<tr>
-				<td>Location:</td><td>{{ degree }}</td>
-			</tr>
-			<tr>
-				<td>Start date:</td><td>{{ grad_year }}</td>
-			</tr>
-			<tr>
-				<td>End Date:</td><td> {{ city }}, {{ country }} </td>
-			</tr>
+		<div id="content">
+			<p><a href="/alumni/job_history/" >Back to Job History </a></p>
 
-		  </table>
+             <div id="list">
+<table border="0" cellpadding="4" width="150%">
+{% csrf_token %}
+    <tr>
+        <td>Company:</td><td>{{ job.company_name }}</td>
+	</tr>
+	<tr>
+        <td>Job Title:</td><td>{{ job.job_title }}</td>
+    </tr>
+	<tr>
+        <td>Job Description:</td><td>{{ job.job_desc }}</td>
+    </tr>
+	<tr>
+        <td>Location:</td><td>{{ job.job_location }} </td>
+    </tr>
+	<tr>
+        <td>Start Date:</td><td>{{ job.start_date }}</td>
+    </tr>
+    <tr>
+        <td>End Date:</td><td>{{ job.end_date }}</td>
+    </tr>
+  </table>
+
+</div>
+
+				<form method="post" action="" align="right" >
+				{% csrf_token %}
+                <input type="submit" class="button" name="delete" value="Delete Job" formaction="/alumni/job/delete/{{ job.id }}/"/>
+					<input type="submit" class="button" name="edit" value="Edit Job" formaction="/alumni/job/edit/{{ job.id }}/"/>
+				</form>
 
 
-		<p><div><form method="post" action=""  >
-		{% csrf_token %}
-			<input type="submit" class="button"  value="Edit Jobs " formaction="/alumni/create_job_history/"/>
-		</form></div></p>
-
+		</div>
 	</div>
 </div>
 <div id="copyright" class="container">
 	<p>&copy; Untitled. All rights reserved. | Photos by <a href="http://fotogrph.com/">Fotogrph</a> | Design by <a href="http://templated.co" rel="nofollow">TEMPLATED</a>.</p>
 </div>
 </body>
+</html>
 </html>

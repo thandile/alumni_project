@@ -36,7 +36,10 @@ urlpatterns = [
     url(r'^profile/edit/(?P<id>\d+)/$', views.edit_profile, name="events_edit"),
     url(r'^search/$', views.search, name="search"),
     url(r'^job_history/$', views.job_history, name="job_history"),
-    url(r'^create_job_history/$', views.job_history, name="create_job_history"),
+    #url(r'^create_job_history/$', views.job_history, name="create_job_history"),
+    url(r'^job/(?P<id>\d+)/$', views.job_view, name="events_view"),
+    url(r'^job/delete/(?P<id>\d+)/$', views.job_delete, name="job_delete"),
+    url(r'^job/edit/(?P<id>\d+)/$', views.job_edit, name="job_edit"),
 
 
 

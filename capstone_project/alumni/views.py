@@ -363,28 +363,29 @@ def profile(request):   #view profile info
             prof.save()
             return render(request, '../templates/alumni/profile.html', {'id' : prof.id, 'name':user_name, 'surname' : user_lastname,'email':user_email, 'grad_year':grad_year, 'degree':degree, \
                                                                               'city':city, 'country': country} )
+        else:
+            try:
+                user = request.user
+                user_info = Profile.objects.get( user_id =user.id)   #retrieving user profile from the database
+                name = user.first_name
+                surname = user.last_name
+                email = user.email
+                city = user_info.city
+                country = user_info.country
+                degree = user_info.degree
+                grad_year = user_info.grad_year
+                search = SearchForm()
 
-        try:
-            user_info = Profile.objects.get( user_id =user.id)   #retrieving user profile from the database
-            name = user.first_name
-            surname = user.last_name
-            email = user.email
-            city = user_info.city
-            country = user_info.country
-            degree = user_info.degree
-            grad_year = user_info.grad_year
-            search = SearchForm()
-
-            #job_info.append(Job.objects.get(job_profile = user.id))
+                #job_info.append(Job.objects.get(job_profile = user.id))
 
 
-            return render(request, '../templates/alumni/profile.html', {'id' : user_info.id, 'search' : search, 'name' : name, 'surname' : surname, 'email' : email,\
-                                                                        'city': city, "country": country, "degree" : degree, \
-                                                                        "grad_year": grad_year} )
-        except:          #displaying form to create profile if user has no profile
-            prof_form = ProfileForm()
-            search = SearchForm()
-            return render(request, '../templates/alumni/createProfile.html', {'form': prof_form, 'search' : search})
+                return render(request, '../templates/alumni/profile.html', {'id' : user_info.id, 'search' : search, 'name' : name, 'surname' : surname, 'email' : email,\
+                                                                            'city': city, "country": country, "degree" : degree, \
+                                                                            "grad_year": grad_year} )
+            except:          #displaying form to create profile if user has no profile
+                prof_form = ProfileForm()
+                search = SearchForm()
+                return render(request, '../templates/alumni/createProfile.html', {'form': prof_form, 'search' : search})
 
 def view_profile(request):
 #view profile info
@@ -483,7 +484,7 @@ def log_in(request):
         user = authenticate(username=username, password=password)
         login(request, user)
         return render(request,'../templates/alumni/homepage.html', {'username' : username})
-    elif request.method == "POST" and request.POST.get('newUser'):  #creating a new user
+    elif request.method == "POST" and request.POST.get('newUser') and request.POST.get("type"):  #creating a new user
         form = UserForm(request.POST)
         if form.is_valid():
             cursor = connection.cursor()
@@ -497,8 +498,7 @@ def log_in(request):
             password = request.POST['password']
             user = authenticate(username=username, password=password)
             login(request, user)
-            return render(request, "../templates/alumni/toProfile.html", {'userid' : new_user.id, 'username' : \
-                new_user.first_name})
+            return render(request, "../templates/alumni/toProfile.html", {'userid' : new_user.id})
     elif request.method == "GET":   #displaying the log in and sign up forms
         logout(request)
         log_in = LoginForm()
@@ -527,7 +527,7 @@ def create_events(request):  #create events
                       year = year, month = month, day = day, street = street, city = city, country = country)
         event.save()
         search = SearchForm()
-        return render(request, '../templates/alumni/display_event.html', { 'search': search, 'id' : event.id, 'title':title, 'event_type':event_type, \
+        return render(request, '../templates/alumni/display_event.html', {'creating_user': user.email, 'search': search, 'id' : event.id, 'title':title, 'event_type':event_type, \
                                                                           'description':description, 'year': year, \
                                                                         'month':month, 'day':day, 'street':street,\
                                                                           'city':city, 'country':country})
@@ -572,9 +572,10 @@ def events_delete(request, id):
     search = SearchForm()
     if request.method == "POST" and request.POST.get('delete'):  #deleting event
         obj = Event.objects.get(pk=id)
-        obj.delete()
-        event = Event.objects.all()
-        return render(request, '../templates/alumni/events.html', {'search': search, 'events': event})
+        if request.user == obj.creating_user:
+            obj.delete()
+            event = Event.objects.all()
+            return render(request, '../templates/alumni/events.html', {'search': search, 'events': event})
     else:
         event = Event.objects.all()    #displaying event
         return render(request, '../templates/alumni/events.html', {'search': search, 'events':event})
@@ -606,7 +607,7 @@ def events_edit(request, id):    #editing an event
         event = Event(creating_user = user, title = title, event_type = event_type, description = description, \
                       year = year, month = month, day = day, street = street, city = city, country = country)
         event.save()
-        return render(request, '../templates/alumni/display_event.html', {'search': search, 'id' : event.id, 'title':title,\
+        return render(request, '../templates/alumni/display_event.html', {'creating_user': user.email, 'search': search, 'id' : event.id, 'title':title,\
                                                                           'event_type':event_type, 'description':description, \
                                                                           'year': year, 'month':month, 'day':day, \
                                                                           'street':street,'city':city, 'country':country})
@@ -641,7 +642,57 @@ def job_history(request):
             if str(i.job_profile) == str(user_info.id):
                 jobs.append(i)
         return render(request, '../templates/alumni/jobs.html', {'search' : search, 'jobs':jobs })
-    else:           #form to add new jobs
+    if request.method == "GET":       #form to add new jobs
         job_form = JobForm()
         return render(request, '../templates/alumni/createJobs.html', {'form': job_form, 'search' : search})
+
+def job_view(request, id):
+    job = Job.objects.get(pk=id)
+    search = SearchForm()
+    return render(request, '../templates/alumni/display_job.html', { 'search': search, 'job': job} )
+
+
+def job_delete(request, id):   #not working properly
+    search = SearchForm()
+    if request.method == "POST" and request.POST.get('delete'):  #deleting event
+        user = request.user
+        user_info = Profile.objects.get(user_id=user.id)
+        obj = Job.objects.get(pk=id)
+        obj.delete()
+        jobs = []
+        job_info = Job.objects.all()
+        for i in job_info:
+            if str(i.job_profile) == str(user_info.id):  #not displaying events after delete
+                jobs.append(i)
+        return render(request, '../templates/alumni/jobs.html', {'search' : search, 'jobs':jobs })
+    else:
+        user = request.user
+        user_info = Profile.objects.get(user_id=user.id)
+        jobs = []
+        job_info = Job.objects.all()
+        for i in job_info:
+            if str(i.job_profile) == str(user_info.id):
+                jobs.append(i)
+        return render(request, '../templates/alumni/jobs.html', {'search' : search, 'job':jobs })
+
+
+def job_edit(request, id):    #editing a job -- finish this
+    search = SearchForm()
+    if request.method == "POST" and request.POST.get('edit'):  #displaying edit event form
+        job = Job.objects.get(pk=id)
+        job = JobForm(initial={'search': search, 'job_title' : job.job_title, 'job_desc' : job.job_desc,\
+                                    'company_name' : job.company_name,  'location' : job.job_location, 'start_date' : job.start_date, \
+                                    'end_date' : job.end_date})
+        return render(request, '../templates/alumni/edit_job.html', {'form' : job})
+    elif request.method == "POST" and request.POST.get('savejobedit'):  #saving the form to the database
+        user = request.user
+        job = Job.objects.get(pk = id)
+        job.company_name = request.POST['company_name']
+        job.job_desc = request.POST['job_desc']
+        job.job_title = request.POST['job_title']
+        job.job_location = request.POST['location']
+        job.start_date = request.POST['start_date']
+        job.end_date = request.POST['end_date']
+        job.save()
+        return render(request, '../templates/alumni/display_job.html', { 'search': search,'job': job} )
 

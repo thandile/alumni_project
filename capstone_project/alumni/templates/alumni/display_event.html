@@ -63,7 +63,7 @@ Released   : 20130903
 <table border="0" cellpadding="4" width="150%">
 {% csrf_token %}
     <tr>
-        <td>Event Title:</td><td>{{ title }}</td>
+        <td>Event Title:</td><td>{{ jobs }}</td>
 	</tr>
 	<tr>
         <td>Event Type:</td><td>{{ event_type }}</td>
@@ -77,6 +77,10 @@ Released   : 20130903
 	<tr>
         <td>Address:</td><td>{{ street }}, {{ city }}, {{ country }} </td>
     </tr>
+	<tr>
+        <td>RSVP:</td><td>{{ creating_user }} </td>
+    </tr>
+
   </table>
 
 </div>

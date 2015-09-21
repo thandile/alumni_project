@@ -44,40 +44,23 @@ Released   : 20130903
 		</div>
 	</div>
 </div>
-
 <div id="wrapper">
 	<div id="page" class="container">
-			<form method="get" action="/alumni/search/" align="right">
+        <form method="get" action="/alumni/search/" align="right">
 		<label for="id_q"></label>
 		{% csrf_token %}
 		{{ search }}
 		<input type="text" name="q" id="id_q"/>
          <input type="submit" value="Submit"/>
         </form>
-
-			<div class="title"><h1>Up Coming Events</h1></div>
-
-
-<table border="0" cellpadding="4" width="100%">
-    <tr>
-
-        <td>Event</td>
-        <td>Date</td>
-    </tr>
-
-    {% for event in events %}
-    {% csrf_token %}
-
-    <tr>
-        <td {% if forloop.last %}class="last"{% endif %}>
-        <a href="/alumni/events/{{ event.id }}/"> {{ event.title }}</a></td>
-        <td {% if forloop.last %}class="last"{% endif %}>{{ event.year}}-{{ event.month }}-{{ event.day }}</td>
-		<td></td>
-    </tr>
-
-    {% endfor %}</table>
-				<p><a class="button" href="/alumni/create_event/">Create New Event</a></p>
-</div>
+		<div id="content">
+			<h3>
+				<p>Create your job history</p></h3>
+			<form method="post" action="" enctype="multipart/form-data">
+				{% csrf_token %}
+				{{ form.as_p}}
+				<input type="submit" class="button" name="savejobedit"  value="Save job" />
+			</form>
 
 		</div>
 	</div>
@@ -86,5 +69,4 @@ Released   : 20130903
 	<p>&copy; Untitled. All rights reserved. | Photos by <a href="http://fotogrph.com/">Fotogrph</a> | Design by <a href="http://templated.co" rel="nofollow">TEMPLATED</a>.</p>
 </div>
 </body>
-</html>
 </html>
