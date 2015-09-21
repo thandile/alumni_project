@@ -47,16 +47,23 @@ Released   : 20130903
 
 <div id="wrapper">
 	<div id="page" class="container">
+			<form method="get" action="/alumni/search/" align="right">
+		<label for="id_q"></label>
+		{% csrf_token %}
+		{{ search }}
+		<input type="text" name="q" id="id_q"/>
+         <input type="submit" value="Submit"/>
+        </form>
 		<div id="content">
 			<p><a href="/alumni/events/" >Back to Events </a></p>
 
 
                 
              <div id="list">
-<table border="0" cellpadding="4" width="100%">
+<table border="0" cellpadding="4" width="150%">
 {% csrf_token %}
     <tr>
-        <td>Event Title:</td><td>{{ title }}</td>
+        <td>Event Title:</td><td>{{ jobs }}</td>
 	</tr>
 	<tr>
         <td>Event Type:</td><td>{{ event_type }}</td>
@@ -70,6 +77,10 @@ Released   : 20130903
 	<tr>
         <td>Address:</td><td>{{ street }}, {{ city }}, {{ country }} </td>
     </tr>
+	<tr>
+        <td>RSVP:</td><td>{{ creating_user }} </td>
+    </tr>
+
   </table>
 
 </div>

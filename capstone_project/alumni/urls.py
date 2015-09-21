@@ -18,7 +18,8 @@ urlpatterns = [
     #url(r'^thread/new/(?P<forum_pk>[0-9]+)$', views.create_new_thread, name = 'create_new_thread'), #, {'forum_pk': 'forum_pk'}),	
     #url(r'^new_thread/$', views.create_new_thread, name = "create_new_thread"),
     url(r'main/', views.main, name='main'),
-    url(r'^$', views.index, name='index'),  # $:: End of String match character
+
+    url(r'^$', views.log_in, name='login'),  # $:: End of String match character
     #url(r'^create/$', views.create, name='create'),
     # web page is generated based on code in views.py -> Note: path will be /alumni/create/ **NOT** /create/
     url(r'^forum/(?P<forum_pk>[0-9]+)/$', views.forum, name='forum'),
@@ -28,9 +29,7 @@ urlpatterns = [
     url(r'^post/(?P<thread_pk>[0-9]+)/$', views.post, name="new_post"), # idea here is for creating a new post, NOT a listing of posts like the above
     url(r'^profile/$', views.create_profile, name='create_profile'),
     url(r'^login/$', views.log_in, name='login'),
-    #url(r'^user_profile/$', views.profile, name='user_profile'),
-    #url(r'^logout/$', views.logout_view, name='logout'),
-    url(r'^userprofile/$', views.profile__view, name='user_profile'),
+    url(r'^userprofile/$', views.profile, name='user_profile'),
     url(r'^home/$', views.home, name='home'),
     #url(r'^edit_profile/$', views.view_profile, name='view_profile'),
 	
@@ -47,6 +46,13 @@ urlpatterns = [
     #url(r'^editProfile/$',views.edit_profile, name ='edit_profile'),
     url(r'^profile/edit/(?P<id>\d+)/$', views.edit_profile, name="events_edit"),
     url(r'^search/$', views.search, name="search"),
+    url(r'^job_history/$', views.job_history, name="job_history"),
+    #url(r'^create_job_history/$', views.job_history, name="create_job_history"),
+    url(r'^job/(?P<id>\d+)/$', views.job_view, name="events_view"),
+    url(r'^job/delete/(?P<id>\d+)/$', views.job_delete, name="job_delete"),
+    url(r'^job/edit/(?P<id>\d+)/$', views.job_edit, name="job_edit"),
+
+
 
     # url(r'^thread/(?P<forum_pk>[0-9]+)/$', views.postthread, name = 'postthread'),
     # url(r"^thread/(\d+)/$", views.create, name = 'thread'),

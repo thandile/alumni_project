@@ -54,18 +54,40 @@ Released   : 20130903
 		<input type="text" name="q" id="id_q"/>
          <input type="submit" value="Submit"/>
         </form>
-
 		<div id="content">
-			<h3>
+			<p><a href="/alumni/job_history/" >Back to Job History </a></p>
 
-            <form method="post" action="" enctype="multipart/form-data">
+             <div id="list">
+<table border="0" cellpadding="4" width="150%">
+{% csrf_token %}
+    <tr>
+        <td>Company:</td><td>{{ job.company_name }}</td>
+	</tr>
+	<tr>
+        <td>Job Title:</td><td>{{ job.job_title }}</td>
+    </tr>
+	<tr>
+        <td>Job Description:</td><td>{{ job.job_desc }}</td>
+    </tr>
+	<tr>
+        <td>Location:</td><td>{{ job.job_location }} </td>
+    </tr>
+	<tr>
+        <td>Start Date:</td><td>{{ job.start_date }}</td>
+    </tr>
+    <tr>
+        <td>End Date:</td><td>{{ job.end_date }}</td>
+    </tr>
+  </table>
+
+</div>
+
+				<form method="post" action="" align="right" >
 				{% csrf_token %}
-				{{ form.as_p}}
-				<input type="submit" class="button" name="save" value="Save Event" />
-			</form>
+                <input type="submit" class="button" name="delete" value="Delete Job" formaction="/alumni/job/delete/{{ job.id }}/"/>
+					<input type="submit" class="button" name="edit" value="Edit Job" formaction="/alumni/job/edit/{{ job.id }}/"/>
+				</form>
 
-
-             </h3>
 
 		</div>
 	</div>

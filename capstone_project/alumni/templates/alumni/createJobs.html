@@ -44,28 +44,23 @@ Released   : 20130903
 		</div>
 	</div>
 </div>
-
 <div id="wrapper">
 	<div id="page" class="container">
-			<form method="get" action="/alumni/search/" align="right">
+        <form method="get" action="/alumni/search/" align="right">
 		<label for="id_q"></label>
 		{% csrf_token %}
 		{{ search }}
 		<input type="text" name="q" id="id_q"/>
          <input type="submit" value="Submit"/>
         </form>
-
 		<div id="content">
 			<h3>
-
-            <form method="post" action="" enctype="multipart/form-data">
+				<p>Create your job history</p></h3>
+			<form method="post" action="" enctype="multipart/form-data">
 				{% csrf_token %}
 				{{ form.as_p}}
-				<input type="submit" class="button" name="save" value="Save Event" />
+				<input type="submit" class="button" name="saveJob"  value="Save job" />
 			</form>
-
-
-             </h3>
 
 		</div>
 	</div>
@@ -74,5 +69,4 @@ Released   : 20130903
 	<p>&copy; Untitled. All rights reserved. | Photos by <a href="http://fotogrph.com/">Fotogrph</a> | Design by <a href="http://templated.co" rel="nofollow">TEMPLATED</a>.</p>
 </div>
 </body>
-</html>
 </html>

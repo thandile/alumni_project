@@ -47,9 +47,14 @@ Released   : 20130903
 
 <div id="wrapper">
 	<div id="page" class="container">
-
-			<h3><p>Upcoming events</p> </h3>
-
+			<form method="get" action="/alumni/search/" align="right">
+		<label for="id_q"></label>
+		{% csrf_token %}
+		{{ search }}
+		<input type="text" name="q" id="id_q"/>
+         <input type="submit" value="Submit"/>
+        </form>
+			<div class="title"><h1>Upcoming Events</h1></div>
 
 <table border="0" cellpadding="4" width="100%">
     <tr>
