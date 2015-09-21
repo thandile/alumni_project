@@ -39,11 +39,7 @@ class Profile(models.Model):
 
 # instead of company on the profile itself, job object linked to a profle
 class Job(models.Model): # job in the 'piece of work history' sense, not a job advert
-<<<<<<< HEAD
-    #job_prof = models.ForeignKey(models.Profile, related_name='job_prof', default = models.Profile.objects.all()[0])
-=======
     job_profile = models.IntegerField(blank=False, null=False)
->>>>>>> tha1809/thandilePrototype
     company_name = models.CharField(max_length=255, blank=True, null=True)
     job_title = models.CharField(max_length=255, blank=True, null=True) #the reference for the company advertising?
     job_desc = models.CharField(max_length=255, blank=True, null=True)
