@@ -167,6 +167,13 @@ def get_query(query_string, search_fields):
             query = query & or_query
     return query
 
+def isInt(foo):
+    try:
+        int(foo)
+        return True
+    except:
+        return False
+
 def search(request):  #searching function
     query_string = ''
     found_entries = None
@@ -174,7 +181,7 @@ def search(request):  #searching function
     searchText = normalize_query(request.GET['q'])[0]
     
     print "**************************************************************************************"
-    print "searchText is ", searchText
+    print "searchText is ", searchText, type(searchText)
     print request.GET['search_item']
     for k,v in request.GET.iteritems():
         print k,v
@@ -182,28 +189,34 @@ def search(request):  #searching function
     
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET['q']
-        #if request.GET['search_item'] == "USER":
-        if request.GET['search_item'] == '1':
+        if request.GET['search_item'] == "USER":
+        #if request.GET['search_item'] == '1':
             # use __in for exact matches and use __contains for "LIKE" and __icontains for case-insenstive LIKE
             # use a LIST for __in , give a string / int / ... for __icontains !
             matches = User.objects.filter(Q(first_name__icontains=searchText) | Q(email__icontains=searchText) | Q(last_name__icontains=searchText)| Q(first_name__in=[searchText]) | Q(email__in=[searchText]) | Q(last_name__in=[searchText]))
             found = make_paginator(request, matches, 20)
             #found_entries = User.objects.filter(entry_query)
             #found = return_search_items("auth_user", found_entries)
-        #if request.GET['search_item'] == "YEAR":
-        if request.GET['search_item'] == '2':
-            matches = models.Profile.objects.filter(grad_year__in=[searchText])
-            found = make_paginator(request, matches, 20)
-        #if request.GET['search_item'] == "DEGREE" or request.GET['search_item'] == "LOC":
-        if request.GET['search_item'] == '3' or request.GET['search_item'] == '6':
+        if request.GET['search_item'] == "YEAR":
+        #if request.GET['search_item'] == '2':
+            # check if what they entered was actually an integer! (Could ENFORCE on the form ideally)
+            #if not searchText.isdigit():
+            if not isInt(searchText):
+                # ideally should the user that they entered something stupid, but instead just show them zero matches for the search
+                found = make_paginator(request, [], 20)
+            else:
+                matches = models.Profile.objects.filter(grad_year__in=[searchText])
+                found = make_paginator(request, matches, 20)
+        if request.GET['search_item'] == "DEGREE" or request.GET['search_item'] == "LOC":
+        #if request.GET['search_item'] == '3' or request.GET['search_item'] == '6':
             matches = models.Profile.objects.filter(Q(degree__icontains=searchText) | Q(city__icontains=searchText) | Q(country__icontains=searchText))
             found = make_paginator(request, matches, 20)
-        #if request.GET['search_item'] == "COMPANY":
-        if request.GET['search_item'] == '4': # note this is a company from Job object - i.e. a piece of someone's work history not a 'jobadvert'
+        if request.GET['search_item'] == "COMPANY":
+        #if request.GET['search_item'] == '4': # note this is a company from Job object - i.e. a piece of someone's work history not a 'jobadvert'
             matches = models.Job.objects.filter(Q(company_name__icontains=searchText) | Q(job_desc__icontains=searchText) | Q(job_title__icontains=searchText))
             found = make_paginator(request, matches, 20)
-        #if request.GET['search_item'] == "JOB":
-        if request.GET['search_item'] == '5':
+        if request.GET['search_item'] == "JOB":
+        #if request.GET['search_item'] == '5':
             matches = models.Advert.objects.filter(Q(city__icontains=searchText) | Q(country__icontains=searchText) | Q(title__icontains=searchText) | Q(description__icontains=searchText) | Q(reference__icontains=searchText))
             found = make_paginator(request, matches, 20)
     
