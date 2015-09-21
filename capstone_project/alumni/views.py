@@ -199,10 +199,10 @@ def search(request):  #searching function
             #found = return_search_items("auth_user", found_entries)
         if request.GET['search_item'] == "YEAR":
         #if request.GET['search_item'] == '2':
-            # check if what they entered was actually an integer! (Could ENFORCE on the form ideally)
+            # check if what they entered was actually an integer! (Could ENFORCE on the form ideally... )
             #if not searchText.isdigit():
             if not isInt(searchText):
-                # ideally should the user that they entered something stupid, but instead just show them zero matches for the search
+                # ideally should tell the user that they entered something stupid, but instead just show them zero matches for the search
                 found = make_paginator(request, [], 20)
             else:
                 matches = models.Profile.objects.filter(grad_year__in=[searchText])
@@ -385,7 +385,6 @@ def spam_those_poor_suckers(subject, message, from_email = None, suckers = None)
     datatuple = (subject, message, from_email, recipients)
     send_mass_mail(datatuple)
     '''
-
 # display the editProfile form of some user Y to some user X. User X can 'suggest' what the field values should be
 # user Y gets a email with the suggested edits and is invited to go update their profile 
 # could (somehow) possible give user Y option to approve changes instead of having them edit it manually? ...
@@ -591,9 +590,11 @@ def log_in(request):
         log_in = LoginForm(request.POST)
         email = request.POST['email']
         password = request.POST['password']
-        userid = User.objects.get(email=email)
+        userid = models.User.objects.get(email=email)
+        #userid = models.User.objects.filter(email=email)[0]
         username = userid.id
         user = authenticate(username=username, password=password)
+        #user = authenticate(email=email, password=password)
         login(request, user)
         return render(request,'../templates/alumni/homepage.html', {'username' : username})
     elif request.method == "POST" and request.POST.get('newUser'):
