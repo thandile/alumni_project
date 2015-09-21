@@ -70,13 +70,11 @@ Optimize the performance and stability of highly-available distributed systems
     thread_a_two = models.Thread(forum = forum_a, creating_user = user_c, title = "Jeff Atwood Fan Club")
     thread_a_two.save()
 
-
-
     # World News
     thread_b_one = models.Thread(forum = forum_b, creating_user = user_b, title = "Japan's new diet: Springbok")
     thread_b_one.save()
-    post_b_one_one = 
-
+    post_b_one_one = models.Post(thread = thread_b_one, creating_user = user_b, title = "What a game.", text = "Absolutely 'Rekt'. I'm seriously considering supporting another game.")
+    post_b_one_one.save()
 
     # General Discussion
     thread_c_one = models.Thread(forum = forum_c, creating_user = user_c, title = "Jokes")

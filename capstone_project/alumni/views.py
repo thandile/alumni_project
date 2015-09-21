@@ -188,14 +188,14 @@ def search(request):  #searching function
     found_entries = None
     found = None
     searchText = normalize_query(request.GET['q'])[0]
-    
+    '''
     print "**************************************************************************************"
     print "searchText is ", searchText, type(searchText)
     print request.GET['search_item']
     for k,v in request.GET.iteritems():
         print k,v
     print "**************************************************************************************"
-    
+    '''
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET['q']
         if request.GET['search_item'] == "USER":
@@ -228,10 +228,13 @@ def search(request):  #searching function
         #if request.GET['search_item'] == '5':
             matches = models.Advert.objects.filter(Q(city__icontains=searchText) | Q(country__icontains=searchText) | Q(title__icontains=searchText) | Q(description__icontains=searchText) | Q(reference__icontains=searchText))
             found = make_paginator(request, matches, 20)
-    
-    return render_to_response('../templates/alumni/search.html',
+    if found:
+        return render_to_response('../templates/alumni/search.html',
                           { 'query_string': query_string, 'found_entries': found },
                           context_instance=RequestContext(request))
+    else:
+        # just redirect to profile view, ideally should give a message 'not found'
+        return profile(request)
 
 def return_search_items(search_model, found_entries):
     items=[]
