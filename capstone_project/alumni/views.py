@@ -23,7 +23,7 @@ class UserForm(forms.Form):
 
 class ProfileForm(forms.Form):
     degree = forms.CharField(max_length=50)
-    grad_year = forms.ChoiceField(choices=[(x,x) for x in range(1970, 2016)])
+    grad_year = forms.ChoiceField(choices=[(x,x) for x in range(2017, 1970)])
     city = forms.CharField(max_length=50)
     country = forms.CharField(max_length=50)
 
@@ -65,9 +65,9 @@ class LoginForm(forms.Form):
 
 class EventsForm(forms.Form):
     title = forms.CharField(max_length=100)
-    event_type = forms.ChoiceField(choices=[('-',''),('reunion', 'reunion'), ("party", "party"), ("colloquim", "colloquim")])
+    event_type = forms.ChoiceField(choices=[('-',''),('reunion', 'reunion'), ("party", "party"), ("other", "other")])
     description = forms.CharField(max_length=140)
-    year = forms.ChoiceField(choices = [(x,x) for x in range (2015,2017)])
+    year = forms.ChoiceField(choices = [(x,x) for x in range (2015,2018)])
     month = forms.ChoiceField(choices = [('-',''),('1','January'),('2','February'),('3', 'March'),('4','April'),('5','May'),\
                                          ('6','June'),('7','July'),('8', 'August'),('9','September'),('10','October'),\
                                          ('11','November'),('12','December')])
@@ -82,9 +82,9 @@ class EventsForm(forms.Form):
 
 class EditEventsForm(forms.Form):
     title = forms.CharField(max_length=100)
-    event_type = forms.ChoiceField(choices=[('-',''),('reunion', 'reunion'), ("party", "party"), ("colloquim", "colloquim")])
+    event_type = forms.ChoiceField(choices=[('-',''),('reunion', 'reunion'), ("party", "party"), ("other", "other")])
     description = forms.CharField(max_length=140)
-    year = forms.ChoiceField(choices = [(x,x) for x in range (2015,2017)])
+    year = forms.ChoiceField(choices = [(x,x) for x in range (2015,2018)])
     month = forms.ChoiceField(choices = [('-',''),('1','January'),('2','February'),('3', 'March'),('4','April'),('5','May'),\
                                          ('6','June'),('7','July'),('8', 'August'),('9','September'),('10','October'),\
                                          ('11','November'),('12','December')])
@@ -417,27 +417,25 @@ def view_profile(request):
         return render(request, '../templates/alumni/createProfile.html', {'search': search, 'form': prof_form})
 
 
-def send_email(recipient, subject, body):
-    import smtplib
-    sender = 'csalumniuct@gmail.com'
-    password = 'alumniteam4'
-    to = [recipient]
-    subject = subject
-    text = body
-
-    message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (sender, ", ".join(to), subject, text)
-    try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.ehlo()
-        server.starttls()
-        server.login(sender, password)
-        server.sendmail(sender, to, message)
-        server.close()
-        print ('successfully sent the mail')
-    except:
-        print ("failed to send mail")
-
+def spam_those_poor_suckers(subject, message, from_email = None, suckers = None):
+    # a function to send mass emails to users
+    # see https://docs.djangoproject.com/en/1.8/ref/contrib/auth/ for email_user()
+    if from_email is None:
+        from_email = r'unreachable@dontbother.com'
+    if suckers is None:
+        suckers = models.User.objects.all()
+    # make a list of emails from 'suckers' (i.e. recipient_list)
+    recipients = []
+    for spamee in suckers:
+        recipients.append(spamee.email)
+        spamee.email_user(subject, message)
+    '''
+    print recipients, type(recipients)
+    # send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None)
+    # datatuple is a tuple in which each element is in this format: (subject, message, from_email, recipient_list)
+    datatuple = (subject, message, from_email, recipients)
+    send_mass_mail(datatuple)
+    '''
 
 
 def edit_profile(request, id):    #editing user profile
@@ -484,7 +482,7 @@ def log_in(request):
         user = authenticate(username=username, password=password)
         login(request, user)
         return render(request,'../templates/alumni/homepage.html', {'username' : username})
-    elif request.method == "POST" and request.POST.get('newUser') and request.POST.get("type"):  #creating a new user
+    elif request.method == "POST" and request.POST.get('newUser'): # and request.POST.get("type"):  #creating a new user
         form = UserForm(request.POST)
         if form.is_valid():
             cursor = connection.cursor()
@@ -526,6 +524,9 @@ def create_events(request):  #create events
         event = Event(creating_user = user, title = title, event_type = event_type, description = description, \
                       year = year, month = month, day = day, street = street, city = city, country = country)
         event.save()
+        spam_those_poor_suckers(title, "Event Description: " + description+ "\n Date: " + day+"-"+month+"-"+year +\
+                                "\n Address: " + street + ", "+city + ", " + country + "\n RSVP: " +user.email, from_email = 'csalumniuct@gmail.com', \
+                                suckers = None)
         search = SearchForm()
         return render(request, '../templates/alumni/display_event.html', {'creating_user': user.email, 'search': search, 'id' : event.id, 'title':title, 'event_type':event_type, \
                                                                           'description':description, 'year': year, \
@@ -562,7 +563,8 @@ def events_view(request, id):   #view selected event
     street = event.street
     city = event.street
     country = event.country
-    return render(request, '../templates/alumni/display_event.html', {'search' : search, 'id' : event.id, 'title':title,\
+    user = event.creating_user
+    return render(request, '../templates/alumni/display_event.html', {'creating_user': user.email,'search' : search, 'id' : event.id, 'title':title,\
                                                                       'event_type':event_type,  'description':description,\
                                                                       'year': year,'month':month, 'day':day,\
                                                                       'street':street, 'city':city, 'country':country})
